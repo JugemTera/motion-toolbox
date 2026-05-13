@@ -1,0 +1,21 @@
+# Simple Spatial Animation Grid Configuration
+
+output_dir: outputs/simple_grid
+output_html: grid.html
+title: Simple Animation Grid
+
+animations:
+  - path: outputs/multi_viewer_test/animation_1.glb
+    label: Animation 1
+  - path: outputs/multi_viewer_test/animation_2.glb
+    label: Animation 2
+  - path: outputs/multi_viewer_test/animation_3.glb
+    label: Animation 3
+  - path: outputs/multi_viewer_test/animation_4.glb
+    label: Animation 4
+
+material_type: physical
+mesh_color: blue
+checkerboard_floor: true
+
+

@@ -1,0 +1,44 @@
+name: "Future Metrics Example"
+version: "1.0"
+
+metadata:
+  description: "Example showing how configs support future metrics not yet implemented"
+  note: "Some metrics may not be available yet - evaluator will skip them gracefully"
+  author: "Motion Toolbox"
+
+metrics:
+  # Current metrics that work
+  - name: "foot_skating"
+    metric: "foot_skating"
+    convention: "height_based_contact"
+    params:
+      velocity_threshold: 0.02
+      contact_height_threshold: 0.05
+      
+  - name: "jerk"
+    metric: "jerk"
+    convention: "standard_jerk"
+    params:
+      jerk_threshold: 500.0  # m/s³ - threshold for high jerk detection (motion capture with finite differences)
+    
+  # Future metrics that don't exist yet - these will be gracefully skipped
+  - name: "pose_accuracy"
+    metric: "pose_accuracy"  # Not implemented yet
+    convention: "joint_angle_diff"
+    params:
+      angle_threshold: 0.1
+    description: "Future metric for pose accuracy assessment"
+    
+  - name: "motion_diversity"
+    metric: "motion_diversity"  # Not implemented yet
+    convention: "trajectory_variation"
+    params:
+      window_size: 30
+    description: "Future metric for motion diversity analysis"
+    
+  - name: "semantic_plausibility"
+    metric: "semantic_plausibility"  # Not implemented yet
+    convention: "action_consistency"
+    params:
+      action_type: "walking"
+    description: "Future metric for semantic motion plausibility"

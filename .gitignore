@@ -1,0 +1,49 @@
+# Custom
+.env
+pipeline/utils/cookies*
+
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info/
+
+# Virtual environments
+.venv
+.venv-*/
+
+# Python build artifacts that might appear in submodules
+**/__pycache__/
+**/*.egg-info/
+**/build/
+**/dist/
+
+output/
+outputs/
+**/output/
+**/outputs/
+
+# Generated test/validation artifacts in sample_data
+sample_data/hand_stack_test/
+sample_data/conversion_verification/
+sample_data/dynamic_score_validation/
+sample_data/mirror_verification/
+# Catch any future generated HTML/GLB output in sample_data subdirectories
+sample_data/**/*.html
+sample_data/**/*.glb
+
+# LLM Instructions - keep locally but don't commit
+**/.cursor/instructions.md
+**/.cursor/instructions/
+**/.github/copilot-instructions.md
+**/.github/instructions/
+
+**/~
+
+# IDE / OS
+.idea/
+.DS_Store
+Thumbs.db
+

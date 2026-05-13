@@ -1,0 +1,60 @@
+name: "Basic Motion Quality Assessment"
+version: "1.0"
+
+metadata:
+  description: "Essential metrics for quick motion quality assessment"
+  use_case: "Fast quality check and basic motion analysis"
+  author: "Motion Toolbox"
+
+global_params:
+  velocity_threshold: 0.02
+  ground_height: 0.0
+
+metrics:
+  - name: "foot_skating"
+    metric: "foot_skating"
+    convention: "closd_mesh_sliding"
+    description: "CLoSD-based mesh foot skating detection for most accurate results"
+    params:
+      margin: 0.005
+      
+  - name: "jerk"
+    metric: "jerk"
+    convention: "peak_jerk"
+    description: "Motion smoothness analysis using peak jerk calculation (FlowMDM/MotionMillion standard)"
+    params:
+      jerk_threshold: 100.0  # m/s³ - threshold for peak jerk detection (not scaled)
+      smoothing_window: 1  # No smoothing in research implementations
+    
+  - name: "ground_penetration"
+    metric: "ground_penetration"
+    convention: "closd_mesh_penetration"
+    description: "CLoSD-based mesh ground penetration detection for most accurate results"
+    params:
+      tolerance: 0.005
+
+  - name: "floating"
+    metric: "floating"
+    convention: "closd_floating"
+    description: "CLoSD floating detection - feet hovering above ground"
+    params:
+      tolerance: 0.005  # 5mm tolerance (CLoSD original)
+      contact_threshold: 0.05  # 50mm contact threshold
+      floating_threshold: 0.05  # 50mm floating threshold (same as contact - floating is non-contact)
+    
+  - name: "dynamic_score"
+    metric: "dynamic_score"
+    convention: "hybrid_velocity_range"
+    description: "Motion activity assessment combining velocity and spatial coverage"
+    params:
+      velocity_weight: 0.7
+      range_weight: 0.3
+      activity_threshold: 0.01
+
+  # Root orientation change metrics
+  - name: "root_orientation_change"
+    metric: "root_orientation_change"
+    convention: "max_root_rotation"
+    description: "Root orientation stability - detects sudden rotation changes (jitter/tracking errors)"
+    params:
+      rotation_threshold_degrees: 45.0  # Threshold for ratio calculation (frames with >45° rotation)

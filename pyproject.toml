@@ -1,0 +1,133 @@
+[project]
+name = "motion-toolbox"
+version = "0.1.0"
+description = "Python library for 3D character motion processing, visualization, and evaluation (ROMO research codebase)."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "CC-BY-NC-4.0" }
+authors = [
+    { name = "Jiahao Zhang" },
+    { name = "Joseph Liu" },
+    { name = "Young-Yoon Lee" },
+    { name = "Seonghyeon Moon" },
+    { name = "Victor Zordan" },
+    { name = "Guy Tevet" },
+    { name = "C. Karen Liu" },
+    { name = "Stephen Gould" },
+    { name = "Oren Jacob" },
+    { name = "Haomiao Jiang" },
+    { name = "Mubbasir Kapadia" },
+    { name = "Yizhak Ben-Shabat" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: Free for non-commercial use",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "numpy>=1.21.0",
+    "scipy>=1.7.0",
+    "matplotlib>=3.3.0",
+    "plotly>=5.0.0",
+    "smplx>=0.1.28",
+    "pygltflib>=1.16.5",
+    "colorlog>=6.9.0",
+    "pyyaml>=6.0.0",
+    "h5py>=3.15.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/<github-org>/motion-toolbox"
+Repository = "https://github.com/<github-org>/motion-toolbox"
+Issues = "https://github.com/<github-org>/motion-toolbox/issues"
+
+[project.optional-dependencies]
+ml = [
+    "torch>=2.0.0",
+    "torchvision>=0.15.0",
+    "torchaudio>=2.0.0",
+    "jax>=0.3.0",
+    "jaxlib>=0.3.0",
+]
+viz = [
+    "opencv-python>=4.5.0",
+    "imageio>=2.9.0",
+    "imageio-ffmpeg>=0.4.0",
+    "requests>=2.25.0",
+    "torch>=2.0.0",
+]
+mhr = [
+    "mhr @ git+https://github.com/facebookresearch/MHR.git",
+    "torch==2.8.0",
+    "torchvision>=0.15.0",
+    "pygltflib>=1.16.5",
+    "smplx>=0.1.28",
+]
+semantic-eval = [
+    "torch>=2.0.0",
+    "spacy>=3.0.0",
+    "gdown>=4.0.0",
+]
+report = [
+    "weasyprint>=53.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.13",
+    "pytest>=6.0.0",
+    "pytest-cov>=2.0.0",
+    "mypy>=0.900",
+    "torch>=2.0.0",
+]
+
+[tool.pytest.ini_options]
+markers = [
+    "requires_mhr: needs MHR / pymomentum and assets",
+    "requires_smpl: needs SMPL body model files on disk",
+    "gpu: needs CUDA GPU",
+]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = [
+    "E501",  # line length (120 + follow-up cleanups)
+    "B904",  # raise-without-from in legacy error paths
+    "B028",  # no explicit stacklevel on warnings
+    "B905",  # zip(strict=) optional
+    "B007",  # unused loop variables in numpy-heavy code
+    "E701",  # multiple statements on one line (legacy)
+    "E402",  # imports after path setup in optional loaders
+    "B006",  # mutable defaults in helpers
+    "B008",  # function calls in defaults (ML-style APIs)
+    "F841",  # unused locals (placeholders / optional branches)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["PLC0415", "B017", "F841", "F401"]
+
+[tool.mypy]
+python_version = "3.11"
+packages = ["motion_toolbox"]
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+check_untyped_defs = false
+disallow_untyped_defs = false

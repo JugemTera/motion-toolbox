@@ -1,0 +1,80 @@
+# Semantic Evaluation Configuration
+#
+# Configuration for text-to-motion semantic metrics following the standard
+# HumanML3D/T2M evaluation protocol (Guo et al., CVPR 2022).
+#
+# These metrics operate on SETS of generated motions, not individual motions.
+# They measure distribution-level properties like generation quality (FID),
+# text-motion alignment (R-Precision, Matching Score), and diversity.
+#
+# Prerequisites:
+#   1. Download evaluator checkpoints: bash scripts/download_t2m_evaluators.sh
+#   2. Install dependencies: pip install motion_toolbox[semantic-eval]
+#   3. Install spacy model: python -m spacy download en_core_web_sm
+#
+# Usage:
+#   from motion_toolbox.evaluation.semantic import SemanticEvaluator
+#   evaluator = SemanticEvaluator(**config)
+#   report = evaluator.evaluate(gen_motions, gen_lens, gt_motions, gt_lens, texts)
+
+name: "Semantic Evaluation (HumanML3D Protocol)"
+version: "1.0"
+
+metadata:
+  description: "Standard text-to-motion semantic evaluation metrics"
+  use_case: "Evaluate text-to-motion generation quality against ground truth"
+  protocol: "HumanML3D / T2M (Guo et al., CVPR 2022)"
+  references:
+    - "MoMask (CVPR 2024): https://github.com/EricGuo5513/momask-codes"
+    - "MDM (ICLR 2023): https://github.com/GuyTevet/motion-diffusion-model"
+
+# Dataset and model configuration
+dataset_name: "humanml"  # "humanml" (263-d) or "kit" (251-d)
+
+# Paths to pre-trained checkpoints and data
+# Adjust these to match your directory structure
+checkpoint_dir: "./checkpoints"  # Contains t2m/text_mot_match/model/finest.tar
+glove_dir: "./glove"             # Contains our_vab_data.npy, our_vab_words.pkl, our_vab_idx.pkl
+
+# Evaluation parameters
+device: "cuda"       # "cpu" or "cuda" or "cuda:0"
+batch_size: 32       # Matches standard T2M protocol (R-Precision pool size)
+num_replications: 20 # Number of evaluation runs for confidence intervals
+seed: 0              # Random seed for reproducibility
+
+# Metric-specific settings
+metrics:
+  fid:
+    enabled: true
+    description: "Frechet Inception Distance - distribution similarity (lower is better)"
+
+  r_precision:
+    enabled: true
+    top_k: 3  # Compute top-1, top-2, top-3
+    description: "Text-to-motion retrieval accuracy (higher is better)"
+
+  matching_score:
+    enabled: true
+    description: "Text-motion alignment quality (lower is better)"
+
+  diversity:
+    enabled: true
+    diversity_times: 300  # Number of random pairs to sample
+    description: "Variation across generated motions (higher is better)"
+
+  multimodality:
+    enabled: false  # Requires multiple generations per prompt
+    mm_num_repeats: 30  # Generations per prompt
+    mm_num_times: 10    # Random pairs per prompt for averaging
+    description: "Variation per text prompt (higher is better)"
+
+# Report generation settings
+report:
+  output_dir: "./reports"
+  basename: "semantic_evaluation"
+  method_name: "Ours"
+  formats:
+    - html   # Interactive report with Plotly charts
+    - latex  # Booktabs table for papers
+    - json   # Raw data for programmatic access
+    - pdf    # Rendered PDF (requires weasyprint)

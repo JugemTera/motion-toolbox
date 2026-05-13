@@ -1,0 +1,57 @@
+name: "Research Method Comparison"
+version: "1.0"
+
+metadata:
+  description: "Side-by-side comparison of different evaluation approaches from research"
+  use_case: "Methodology comparison and ablation studies"
+  author: "Motion Toolbox"
+
+global_params:
+  velocity_threshold: 0.02
+
+metrics:
+  # Compare foot skating detection methods
+  - name: "foot_skating_height_loose"
+    metric: "foot_skating"
+    convention: "height_based_contact"
+    description: "Loose height-based detection (higher threshold)"
+    params:
+      contact_height_threshold: 0.08  # 8cm
+      
+  - name: "foot_skating_height_strict"
+    metric: "foot_skating"
+    convention: "height_based_contact"
+    description: "Strict height-based detection (lower threshold)"
+    params:
+      contact_height_threshold: 0.03  # 3cm
+      
+  - name: "foot_skating_stablemotion"
+    metric: "foot_skating"
+    convention: "displacement_based_contact"
+    description: "StableMotion methodology"
+    params:
+      displacement_threshold: 0.01
+      
+  # Compare jerk calculations
+  - name: "jerk_mean"
+    metric: "jerk"
+    convention: "mean_jerk"
+    description: "Mean jerk (StableMotion/GVHMR standard)"
+    params:
+      jerk_threshold: 10.0  # StableMotion/GVHMR use /10.0 scaling, adjusted threshold
+    
+  - name: "jerk_peak"
+    metric: "jerk"
+    convention: "peak_jerk"
+    description: "Peak jerk (FlowMDM/MotionMillion standard)"
+    params:
+      jerk_threshold: 100.0  # m/s³ - threshold for peak jerk detection (not scaled)
+      smoothing_window: 1  # No smoothing in research implementations
+
+  # Root orientation stability
+  - name: "root_orientation_change"
+    metric: "root_orientation_change"
+    convention: "max_root_rotation"
+    description: "Root orientation stability - detects sudden rotation changes (jitter/tracking errors)"
+    params:
+      rotation_threshold_degrees: 45.0  # Threshold for ratio calculation (frames with >45° rotation)

@@ -1,0 +1,32 @@
+# Default SMPL Fitting Configuration (Optimal)
+# Uses LBFGS 20 with two-stage optimization for best speed/quality balance
+
+# Optimizer settings
+optimizer:
+  type: "lbfgs"  # Options: "lbfgs", "adam"
+  num_iterations: 20  # Optimal with LBFGS
+  
+# Optimization strategy
+strategy:
+  single_stage: false  # Two-stage optimization (camera + body) for better convergence
+  use_batching: true
+  batch_size: 32
+  beta_optimization: true  # Allow body shape optimization (standard approach)
+  
+# Loss weights
+loss_weights:
+  joint_loss: 600.0  # Standard from MDM/HumanML3D
+  pose_prior: 1.0
+  angle_prior: 15.02
+  shape_prior: 5e-3
+  
+# Device
+device: "cuda:0"  # Options: "cuda:0", "cpu"
+
+# Description
+description: "Default optimal configuration using two-stage LBFGS 20 iterations with beta optimization"
+expected_performance:
+  speedup: "~5x vs 100 iters"
+  error: "~1.0cm"
+  quality: "Excellent"
+  use_case: "Default for fast SMPL mesh generation with excellent quality"

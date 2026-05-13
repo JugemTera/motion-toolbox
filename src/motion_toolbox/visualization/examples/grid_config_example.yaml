@@ -1,0 +1,63 @@
+# Spatial Animation Grid Configuration Example
+# This file demonstrates all available configuration options
+
+# Output settings
+output_dir: outputs/spatial_grid_example
+output_html: my_animation_grid.html
+title: My Spatial Animation Grid
+
+# Animation sources
+# Can be:
+#   - Paths to GLB files (relative or absolute)
+#   - Paths to .pt files (will be converted)
+#   - Paths to Motion objects
+animations:
+  - path: outputs/multi_viewer_test/animation_1.glb
+    label: Walk
+    details:
+      Category: Locomotion
+      Subcategory: Walk
+      Text: Person walking forward
+      Model: GT
+  
+  - path: outputs/multi_viewer_test/animation_2.glb
+    label: Run
+    details:
+      Category: Locomotion
+      Subcategory: Run
+      Text: Person running fast
+      Model: GT
+  
+  - path: outputs/multi_viewer_test/animation_3.glb
+    label: Jump
+    details:
+      Category: Action
+      Subcategory: Jump
+      Text: Person jumping
+      Model: GT
+  
+  - path: outputs/multi_viewer_test/animation_4.glb
+    label: Dance
+    details:
+      Category: Dance
+      Subcategory: Freestyle
+      Text: Person dancing
+      Model: GT
+
+# Grid layout
+grid_cols: 2  # Number of columns (null for auto-calculate)
+spacing: 3.0  # Spacing between characters in meters
+
+# Visual settings
+material_type: physical  # Options: phong, lambert, physical
+mesh_color: blue         # Options: white, blue, clay, grey
+show_ground: true        # Show ground plane
+checkerboard_floor: true # Use checkerboard pattern (false for solid)
+
+# GLB embedding
+embed_glbs: true  # Embed GLB files as base64 (true for self-contained HTML)
+
+# Body model path (only needed for .pt file conversion)
+body_model_path: null  # e.g., ~/.motion_toolbox/datasets/body_models/SMPL_NEUTRAL.pkl
+
+

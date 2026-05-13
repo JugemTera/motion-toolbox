@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{TITLE}}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f5f5f5;
+            overflow: hidden;
+        }
+        
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        #controls {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 25px;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            min-width: 450px;
+        }
+        
+        #controls-title {
+            font-size: 10px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+        
+        #timeline-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            width: 100%;
+        }
+        
+        #timeline-slider {
+            flex: 1;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+        }
+        
+        #timeline-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #2196F3;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        #timeline-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 10px rgba(33, 150, 243, 0.6);
+        }
+        
+        #timeline-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #2196F3;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        #timeline-slider::-moz-range-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 10px rgba(33, 150, 243, 0.6);
+        }
+        
+        #time-display {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 11px;
+            font-weight: 600;
+            min-width: 90px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            line-height: 1.2;
+        }
+        
+        #time-display .time-seconds {
+            font-size: 12px;
+        }
+        
+        #time-display .time-frames {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        #button-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 18px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+        
+        button:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        #keyframe-controls {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 20px;
+            border-radius: 20px;
+            display: flex;
+            gap: 15px;
+            flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            min-width: 200px;
+        }
+        
+        #keyframe-controls-title {
+            font-size: 10px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .control-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        #opacity-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+        }
+        
+        #opacity-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #2196F3;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        #opacity-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 10px rgba(33, 150, 243, 0.6);
+        }
+        
+        #opacity-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #2196F3;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        #opacity-slider::-moz-range-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 10px rgba(33, 150, 243, 0.6);
+        }
+        
+        #opacity-value {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .mode-toggle-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 16px;
+            border-radius: 18px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: none;
+        }
+        
+        .mode-toggle-button.active {
+            background: #2196F3;
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+        
+        .mode-toggle-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .mode-toggle-button.active:hover {
+            background: #1976D2;
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+        }
+        
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 30px 50px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            z-index: 1000;
+            text-align: center;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto 0;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        Loading motion data...
+        <div class="spinner"></div>
+    </div>
+    
+    <div id="canvas-container"></div>
+    
+    <div id="controls">
+        <div id="controls-title">Playback Controls</div>
+        <div id="timeline-row">
+            <input type="range" id="timeline-slider" min="0" max="1000" value="0" step="1">
+            <div id="time-display">
+                <div class="time-seconds">0.00s / 0.00s</div>
+                <div class="time-frames">0f / 0f</div>
+            </div>
+        </div>
+        <div id="button-row">
+            <button id="play-btn">▶ Play</button>
+            <button id="pause-btn">⏸ Pause</button>
+            <button id="restart-btn">⏮ Restart</button>
+        </div>
+    </div>
+    
+    <div id="keyframe-controls">
+        <div id="keyframe-controls-title">Keyframe Options</div>
+        
+        <div class="control-group">
+            <div class="control-label">Opacity</div>
+            <input type="range" id="opacity-slider" min="0" max="100" value="50" step="1">
+            <div id="opacity-value">50%</div>
+        </div>
+        
+        <div class="control-group">
+            <div class="control-label">Display Mode</div>
+            <button id="mode-overlap-btn" class="mode-toggle-button active">Overlap Mode</button>
+            <button id="mode-disappear-btn" class="mode-toggle-button">Disappear Mode</button>
+        </div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // Load motion data
+        const motionData = {{MOTION_DATA}};
+        
+        console.log('Motion data loaded:', {
+            numFrames: motionData.numFrames,
+            numKeyframes: motionData.keyframeIndices.length,
+            framerate: motionData.framerate
+        });
+
+        // Setup scene
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xffffff);
+        
+        // Setup camera
+        const camera = new THREE.PerspectiveCamera(
+            60,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            1000
+        );
+        camera.position.set(5, 3, 5);
+        camera.lookAt(0, 1, 0);
+        
+        // Setup renderer with enhanced antialiasing
+        const renderer = new THREE.WebGLRenderer({ 
+            antialias: true,
+            alpha: false,
+            stencil: false,
+            powerPreference: 'high-performance'
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+        
+        // Setup controls
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.target.set(0, 1, 0);
+        
+        // Lighting - Balanced for good depth perception
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        scene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        directionalLight.position.set(5, 10, 5);
+        directionalLight.castShadow = true;
+        directionalLight.shadow.camera.left = -20;
+        directionalLight.shadow.camera.right = 20;
+        directionalLight.shadow.camera.top = 20;
+        directionalLight.shadow.camera.bottom = -20;
+        directionalLight.shadow.mapSize.width = 4096;
+        directionalLight.shadow.mapSize.height = 4096;
+        directionalLight.shadow.bias = -0.0001;
+        directionalLight.shadow.radius = 2;
+        scene.add(directionalLight);
+        
+        const fillLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        fillLight.position.set(-5, 8, -5);
+        scene.add(fillLight);
+        
+        const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x888888, 0.3);
+        scene.add(hemisphereLight);
+        
+        // Ground plane
+        {{GROUND_PLANE_CODE}}
+        
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+        
+        // Create material based on type
+        const materialType = '{{MATERIAL_TYPE}}';
+        const meshColor = {{MESH_COLOR_HEX}};
+        
+        function createMaterial(opacity = 1.0, transparent = false) {
+            let material;
+            if (materialType === 'lambert') {
+                material = new THREE.MeshLambertMaterial({
+                    color: meshColor,
+                    side: THREE.DoubleSide,
+                    transparent: transparent,
+                    opacity: opacity,
+                });
+            } else if (materialType === 'physical') {
+                material = new THREE.MeshPhysicalMaterial({
+                    color: meshColor,
+                    roughness: 0.7,
+                    metalness: 0.0,
+                    clearcoat: 0.0,
+                    side: THREE.DoubleSide,
+                    transparent: transparent,
+                    opacity: opacity,
+                });
+            } else {  // phong (default)
+                material = new THREE.MeshPhongMaterial({
+                    color: meshColor,
+                    shininess: 20,
+                    specular: 0x222222,
+                    flatShading: false,
+                    side: THREE.DoubleSide,
+                    transparent: transparent,
+                    opacity: opacity,
+                });
+            }
+            return material;
+        }
+        
+        // Create geometry from faces
+        const faces = new Uint32Array(motionData.faces.flat());
+        const geometry = new THREE.BufferGeometry();
+        geometry.setIndex(new THREE.BufferAttribute(faces, 1));
+        
+        // Create animation mesh
+        const animationGeometry = geometry.clone();
+        const animationMaterial = createMaterial(1.0, false);
+        const animationMesh = new THREE.Mesh(animationGeometry, animationMaterial);
+        animationMesh.castShadow = true;
+        animationMesh.receiveShadow = true;
+        scene.add(animationMesh);
+        
+        // Create keyframe meshes
+        const keyframeMeshes = [];
+        const initialOpacity = {{KEYFRAME_OPACITY}};
+        
+        for (let i = 0; i < motionData.keyframeIndices.length; i++) {
+            const kfGeometry = geometry.clone();
+            const kfMaterial = createMaterial(initialOpacity, true);
+            const kfMesh = new THREE.Mesh(kfGeometry, kfMaterial);
+            
+            // Note: Keyframe vertices already include translation from SMPL,
+            // so we keep the mesh at origin (0, 0, 0) just like the main animation
+            // kfMesh.position stays at (0, 0, 0) by default
+            
+            // Set vertices for this keyframe
+            const kfVertices = motionData.keyframeVertices[i];
+            const kfPositions = new Float32Array(kfVertices.flat());
+            kfGeometry.setAttribute('position', new THREE.BufferAttribute(kfPositions, 3));
+            kfGeometry.computeVertexNormals();
+            
+            kfMesh.castShadow = true;
+            kfMesh.receiveShadow = true;
+            kfMesh.userData.frameIndex = motionData.keyframeIndices[i];
+            kfMesh.userData.initiallyVisible = true;
+            
+            keyframeMeshes.push(kfMesh);
+            scene.add(kfMesh);
+        }
+        
+        console.log(`Created ${keyframeMeshes.length} keyframe meshes`);
+        
+        // Animation state
+        let currentFrame = 0;
+        let isPlaying = true;
+        let isScrubbing = false;
+        let displayMode = 'overlap';  // 'overlap' or 'disappear'
+        
+        // Update animation mesh vertices for current frame
+        function updateAnimationMesh(frameIndex) {
+            const frameVertices = motionData.animationVertices[frameIndex];
+            const positions = new Float32Array(frameVertices.flat());
+            animationGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            animationGeometry.computeVertexNormals();
+            animationGeometry.attributes.position.needsUpdate = true;
+        }
+        
+        // Update keyframe visibility based on mode and current frame
+        function updateKeyframeVisibility() {
+            if (displayMode === 'overlap') {
+                // All keyframes visible
+                keyframeMeshes.forEach(mesh => {
+                    mesh.visible = true;
+                });
+            } else if (displayMode === 'disappear') {
+                // Hide keyframes when animation reaches or passes them
+                keyframeMeshes.forEach(mesh => {
+                    if (currentFrame >= mesh.userData.frameIndex) {
+                        mesh.visible = false;
+                    } else {
+                        mesh.visible = true;
+                    }
+                });
+            }
+        }
+        
+        // Playback controls
+        const playBtn = document.getElementById('play-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const timelineSlider = document.getElementById('timeline-slider');
+        const timeDisplay = document.getElementById('time-display');
+        
+        playBtn.addEventListener('click', () => {
+            isPlaying = true;
+        });
+        
+        pauseBtn.addEventListener('click', () => {
+            isPlaying = false;
+        });
+        
+        restartBtn.addEventListener('click', () => {
+            currentFrame = 0;
+            updateAnimationMesh(currentFrame);
+            updateKeyframeVisibility();
+            updateTimeDisplay();
+            timelineSlider.value = 0;
+            isPlaying = true;
+        });
+        
+        // Timeline scrubbing
+        timelineSlider.addEventListener('input', (e) => {
+            isScrubbing = true;
+            const progress = parseInt(e.target.value) / 1000;
+            currentFrame = Math.floor(progress * (motionData.numFrames - 1));
+            updateAnimationMesh(currentFrame);
+            updateKeyframeVisibility();
+            updateTimeDisplay();
+        });
+        
+        timelineSlider.addEventListener('change', () => {
+            isScrubbing = false;
+        });
+        
+        // Opacity control
+        const opacitySlider = document.getElementById('opacity-slider');
+        const opacityValue = document.getElementById('opacity-value');
+        
+        opacitySlider.addEventListener('input', (e) => {
+            const opacity = parseInt(e.target.value) / 100;
+            opacityValue.textContent = `${e.target.value}%`;
+            
+            keyframeMeshes.forEach(mesh => {
+                mesh.material.opacity = opacity;
+            });
+        });
+        
+        // Mode toggle buttons
+        const modeOverlapBtn = document.getElementById('mode-overlap-btn');
+        const modeDisappearBtn = document.getElementById('mode-disappear-btn');
+        
+        modeOverlapBtn.addEventListener('click', () => {
+            displayMode = 'overlap';
+            modeOverlapBtn.classList.add('active');
+            modeDisappearBtn.classList.remove('active');
+            updateKeyframeVisibility();
+        });
+        
+        modeDisappearBtn.addEventListener('click', () => {
+            displayMode = 'disappear';
+            modeDisappearBtn.classList.add('active');
+            modeOverlapBtn.classList.remove('active');
+            updateKeyframeVisibility();
+        });
+        
+        // Time display update
+        function updateTimeDisplay() {
+            const currentTime = currentFrame / motionData.framerate;
+            const totalTime = motionData.numFrames / motionData.framerate;
+            
+            const secondsDiv = timeDisplay.querySelector('.time-seconds');
+            const framesDiv = timeDisplay.querySelector('.time-frames');
+            
+            if (secondsDiv && framesDiv) {
+                secondsDiv.textContent = `${currentTime.toFixed(2)}s / ${totalTime.toFixed(2)}s`;
+                framesDiv.textContent = `${currentFrame}f / ${motionData.numFrames}f`;
+            }
+            
+            // Update timeline slider
+            if (!isScrubbing) {
+                const progress = currentFrame / (motionData.numFrames - 1);
+                timelineSlider.value = Math.floor(progress * 1000);
+            }
+        }
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // Initialize first frame
+        updateAnimationMesh(0);
+        updateKeyframeVisibility();
+        updateTimeDisplay();
+        
+        // Hide loading screen
+        document.getElementById('loading').style.display = 'none';
+        
+        // Animation loop
+        const clock = new THREE.Clock();
+        let lastFrameTime = 0;
+        const frameTime = 1 / motionData.framerate;
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (isPlaying && !isScrubbing) {
+                const elapsed = clock.getElapsedTime();
+                const deltaFrames = Math.floor((elapsed - lastFrameTime) / frameTime);
+                
+                if (deltaFrames > 0) {
+                    currentFrame += deltaFrames;
+                    
+                    if (currentFrame >= motionData.numFrames) {
+                        currentFrame = 0;
+                    }
+                    
+                    updateAnimationMesh(currentFrame);
+                    updateKeyframeVisibility();
+                    updateTimeDisplay();
+                    
+                    lastFrameTime = elapsed;
+                }
+            }
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        
+        animate();
+    </script>
+</body>
+</html>
+

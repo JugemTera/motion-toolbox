@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{TITLE}}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f5f5f5;
+            overflow: hidden;
+        }
+        
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        
+        #controls {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 25px;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            min-width: 450px;
+        }
+        
+        #controls-title {
+            font-size: 10px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+        
+        #timeline-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            width: 100%;
+        }
+        
+        #timeline-slider {
+            flex: 1;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+        }
+        
+        #timeline-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #2196F3;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        #timeline-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 10px rgba(33, 150, 243, 0.6);
+        }
+        
+        #timeline-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #2196F3;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        #timeline-slider::-moz-range-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 10px rgba(33, 150, 243, 0.6);
+        }
+        
+        #time-display {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 11px;
+            font-weight: 600;
+            min-width: 90px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            line-height: 1.2;
+        }
+        
+        #time-display .time-seconds {
+            font-size: 12px;
+        }
+        
+        #time-display .time-frames {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        #button-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        #toggle-controls {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 20px;
+            border-radius: 20px;
+            display: flex;
+            gap: 10px;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+        }
+        
+        #toggle-controls-title {
+            font-size: 10px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+            white-space: nowrap;
+        }
+        
+        #toggle-buttons {
+            display: flex;
+            gap: 10px;
+            flex-direction: row;
+        }
+        
+        button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 18px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+        
+        button:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        #details-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 20px;
+            border-radius: 12px;
+            min-width: 250px;
+            max-width: 350px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 200;
+            backdrop-filter: blur(10px);
+        }
+        
+        #details-panel.visible {
+            display: block;
+        }
+        
+        #details-panel h3 {
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2196F3;
+            border-bottom: 2px solid #2196F3;
+            padding-bottom: 10px;
+        }
+        
+        #details-content {
+            font-size: 14px;
+        }
+        
+        #details-content .detail-item {
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        #details-content .detail-label {
+            font-weight: 600;
+            color: #555;
+            margin-right: 10px;
+        }
+        
+        #details-content .detail-value {
+            color: #333;
+            text-align: right;
+            flex: 1;
+        }
+        
+        #close-details {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            line-height: 1;
+            box-shadow: none;
+        }
+        
+        #close-details:hover {
+            color: #333;
+            background: none;
+        }
+        
+        .toggle-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            padding: 8px 14px;
+            border-radius: 18px;
+            font-weight: 600;
+            box-shadow: none;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .toggle-button.active {
+            background: #2196F3;
+            color: white;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+            border-color: transparent;
+        }
+        
+        .toggle-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .toggle-button.active:hover {
+            background: #1976D2;
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 30px 50px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            z-index: 1000;
+            text-align: center;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto 0;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        Loading animations...
+        <div class="spinner"></div>
+    </div>
+    
+    <div id="canvas-container"></div>
+    
+    <div id="controls">
+        <div id="controls-title">Playback Controls</div>
+        <div id="timeline-row">
+            <input type="range" id="timeline-slider" min="0" max="1000" value="0" step="1">
+            <div id="time-display">
+                <div class="time-seconds">0.00s / 0.00s</div>
+                <div class="time-frames">0f / 0f</div>
+            </div>
+        </div>
+        <div id="button-row">
+            <button id="play-btn">▶ Play</button>
+            <button id="pause-btn">⏸ Pause</button>
+            <button id="restart-btn">⏮ Restart</button>
+        </div>
+    </div>
+    
+    <div id="toggle-controls">
+        <div id="toggle-controls-title">View Options</div>
+        <div id="toggle-buttons">
+            <button id="toggle-labels-btn" class="toggle-button active" title="Toggle labels (L)">🏷️ Labels</button>
+            <button id="toggle-details-btn" class="toggle-button" title="Show/hide details panel (I)">ℹ️ Info</button>
+        </div>
+    </div>
+    
+    <div id="details-panel">
+        <button id="close-details">×</button>
+        <h3>Animation Details</h3>
+        <div id="details-content">
+            <p style="color: #999;">Click on a character to see details</p>
+        </div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // Scene data
+        const sceneData = {{SCENE_DATA}};
+
+        // Setup scene
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xffffff);  // White background
+        
+        // Setup camera
+        const camera = new THREE.PerspectiveCamera(
+            60,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            1000
+        );
+        camera.position.set(5, 3, 5);
+        camera.lookAt(0, 1, 0);
+        
+        // Setup renderer with enhanced antialiasing
+        const renderer = new THREE.WebGLRenderer({ 
+            antialias: true,
+            alpha: false,
+            stencil: false,
+            powerPreference: 'high-performance'
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));  // Cap at 2x for performance
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+        
+        // Setup controls
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.target.set(0, 1, 0);
+        
+        // Lighting - Balanced for good depth perception
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);  // Low ambient to preserve depth
+        scene.add(ambientLight);
+        
+        // Main key light (strong for definition)
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        directionalLight.position.set(5, 10, 5);
+        directionalLight.castShadow = true;
+        directionalLight.shadow.camera.left = -20;
+        directionalLight.shadow.camera.right = 20;
+        directionalLight.shadow.camera.top = 20;
+        directionalLight.shadow.camera.bottom = -20;
+        directionalLight.shadow.mapSize.width = 4096;  // Higher resolution for smoother shadows
+        directionalLight.shadow.mapSize.height = 4096;
+        directionalLight.shadow.bias = -0.0001;  // Reduce shadow acne
+        directionalLight.shadow.radius = 2;  // Softer shadow edges
+        scene.add(directionalLight);
+        
+        // Fill light from opposite side (softer)
+        const fillLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        fillLight.position.set(-5, 8, -5);
+        scene.add(fillLight);
+        
+        // Hemisphere light for natural ambient
+        const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x888888, 0.3);
+        scene.add(hemisphereLight);
+        
+        // Ground plane
+        {{GROUND_PLANE_CODE}}
+        
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+        
+        // Label creation helper
+        function createLabelTexture(text) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // High DPI canvas
+            canvas.width = 512;
+            canvas.height = 128;
+            
+            // Background with rounded corners
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+            ctx.beginPath();
+            ctx.roundRect(0, 0, 512, 128, 15);
+            ctx.fill();
+            
+            // Text
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 48px Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, 256, 64);
+            
+            return new THREE.CanvasTexture(canvas);
+        }
+        
+        // Arrays to track sprites and clickable models
+        const labelSprites = [];
+        const clickableModels = [];
+        let labelsVisible = true;
+        
+        // Animation mixers
+        const mixers = [];
+        const actions = [];  // Store actions to control animation time
+        let isPlaying = false;
+        
+        // Load all GLB files
+        const loader = new GLTFLoader();
+        let loadedCount = 0;
+        
+        sceneData.forEach((data, index) => {
+            loader.load(
+                data.glb,
+                (gltf) => {
+                    const model = gltf.scene;
+                    
+                    // Position model
+                    model.position.set(data.position[0], data.position[1], data.position[2]);
+                    
+                    // Replace materials and enable shadows
+                    model.traverse((child) => {
+                        if (child.isMesh) {
+                            // Compute smooth vertex normals for proper shading
+                            if (child.geometry) {
+                                child.geometry.computeVertexNormals();
+                            }
+                            
+                            // Create material based on type
+                            let material;
+                            const materialType = '{{MATERIAL_TYPE}}';
+                            const meshColor = {{MESH_COLOR_HEX}};
+                            
+                            if (materialType === 'lambert') {
+                                material = new THREE.MeshLambertMaterial({
+                                    color: meshColor,
+                                    side: THREE.DoubleSide,
+                                });
+                            } else if (materialType === 'physical') {
+                                material = new THREE.MeshPhysicalMaterial({
+                                    color: meshColor,
+                                    roughness: 0.7,
+                                    metalness: 0.0,
+                                    clearcoat: 0.0,
+                                    side: THREE.DoubleSide,
+                                });
+                            } else {  // phong (default)
+                                material = new THREE.MeshPhongMaterial({
+                                    color: meshColor,
+                                    shininess: 20,
+                                    specular: 0x222222,
+                                    flatShading: false,
+                                    side: THREE.DoubleSide,
+                                });
+                            }
+                            
+                            child.material = material;
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                        }
+                    });
+                    
+                    scene.add(model);
+                    
+                    // Store model userData for click handling
+                    model.userData = {
+                        index: index,
+                        label: data.label || null,
+                        details: data.details || null
+                    };
+                    
+                    // Add to clickable models array
+                    if (data.details) {
+                        clickableModels.push(model);
+                    }
+                    
+                    // Create billboard label if label exists
+                    if (data.label) {
+                        const labelTexture = createLabelTexture(data.label);
+                        const spriteMaterial = new THREE.SpriteMaterial({ 
+                            map: labelTexture,
+                            transparent: true,
+                            depthTest: false  // Always visible in front
+                        });
+                        const sprite = new THREE.Sprite(spriteMaterial);
+                        
+                        // Position above character (2.5m up)
+                        sprite.position.set(
+                            data.position[0],
+                            data.position[1] + 2.5,
+                            data.position[2]
+                        );
+                        
+                        // Scale sprite (width, height)
+                        sprite.scale.set(2, 0.5, 1);
+                        
+                        // Store reference
+                        labelSprites.push(sprite);
+                        scene.add(sprite);
+                    }
+                    
+                    // Setup animation
+                    if (gltf.animations && gltf.animations.length > 0) {
+                        const mixer = new THREE.AnimationMixer(model);
+                        const action = mixer.clipAction(gltf.animations[0]);
+                        action.play();
+                        mixers.push(mixer);
+                        actions.push(action);  // Store action for manual time control
+                    }
+                    
+                    loadedCount++;
+                    if (loadedCount === sceneData.length) {
+                        document.getElementById('loading').style.display = 'none';
+                        isPlaying = true;
+                        // Calculate animation duration once all animations are loaded
+                        updateAnimationDuration();
+                    }
+                },
+                undefined,
+                (error) => {
+                    console.error('Error loading GLB:', error);
+                }
+            );
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // Timeline scrubber state
+        let animationDuration = 0;
+        let animationFPS = 30;  // Default FPS, will be calculated from animation
+        let isScrubbing = false;
+        const timelineSlider = document.getElementById('timeline-slider');
+        const timeDisplay = document.getElementById('time-display');
+        
+        // Helper function to update time display with frames
+        function updateTimeDisplay(currentTime, totalTime) {
+            const currentFrame = Math.round(currentTime * animationFPS);
+            const totalFrames = Math.round(totalTime * animationFPS);
+            
+            const secondsDiv = timeDisplay.querySelector('.time-seconds');
+            const framesDiv = timeDisplay.querySelector('.time-frames');
+            
+            if (secondsDiv && framesDiv) {
+                secondsDiv.textContent = `${currentTime.toFixed(2)}s / ${totalTime.toFixed(2)}s`;
+                framesDiv.textContent = `${currentFrame}f / ${totalFrames}f`;
+            }
+        }
+        
+        // Calculate max animation duration after all animations load
+        function updateAnimationDuration() {
+            animationDuration = 0;
+            let totalFrames = 0;
+            
+            mixers.forEach(mixer => {
+                if (mixer._actions && mixer._actions.length > 0) {
+                    const clip = mixer._actions[0]._clip;
+                    const duration = clip.duration;
+                    animationDuration = Math.max(animationDuration, duration);
+                    
+                    // Calculate FPS from first track (if available)
+                    if (clip.tracks && clip.tracks.length > 0 && totalFrames === 0) {
+                        const track = clip.tracks[0];
+                        if (track.times && track.times.length > 1) {
+                            // Estimate FPS from time samples
+                            const timeDelta = track.times[1] - track.times[0];
+                            if (timeDelta > 0) {
+                                animationFPS = Math.round(1 / timeDelta);
+                            }
+                            totalFrames = track.times.length;
+                        }
+                    }
+                }
+            });
+            
+            // Update time display
+            updateTimeDisplay(0, animationDuration);
+        }
+        
+        // Update timeline position from current animation time
+        function updateTimelineFromMixer() {
+            if (!isScrubbing && actions.length > 0 && animationDuration > 0) {
+                // Get time from first action (all should be synced)
+                const currentTime = actions[0].time || 0;
+                const sliderValue = (currentTime / animationDuration) * 1000;
+                timelineSlider.value = sliderValue;
+                updateTimeDisplay(currentTime, animationDuration);
+            }
+        }
+        
+        // Timeline scrubber input handler
+        timelineSlider.addEventListener('input', (e) => {
+            isScrubbing = true;
+            const sliderValue = parseInt(e.target.value);
+            const targetTime = (sliderValue / 1000) * animationDuration;
+            
+            console.log(`Scrubbing to ${targetTime.toFixed(2)}s, actions: ${actions.length}`);
+            
+            // Update all actions to the target time and force mixer update to apply transforms
+            actions.forEach((action, idx) => {
+                action.time = targetTime;  // Set action time directly
+                mixers[idx].update(0);     // Force mixer to apply the time change immediately
+                console.log(`  Action ${idx}: time set to ${action.time.toFixed(2)}s`);
+            });
+            
+            // Update time display
+            updateTimeDisplay(targetTime, animationDuration);
+            
+            // Update controls before rendering
+            controls.update();
+            
+            // Force render to show the scrubbed frame (important when paused)
+            renderer.render(scene, camera);
+            
+            console.log('  Render complete');
+        });
+        
+        // Stop scrubbing when mouse is released
+        timelineSlider.addEventListener('change', () => {
+            isScrubbing = false;
+            // Reset the clock to prevent delta accumulation from before the scrub
+            clock.getDelta();
+            // Force one final render to ensure the frame is visible (important when paused)
+            renderer.render(scene, camera);
+        });
+        
+        // Playback controls
+        document.getElementById('play-btn').addEventListener('click', () => {
+            isPlaying = true;
+            mixers.forEach(mixer => {
+                mixer.timeScale = 1;
+            });
+            clock.getDelta();  // Reset clock to prevent time jump
+        });
+        
+        document.getElementById('pause-btn').addEventListener('click', () => {
+            isPlaying = false;
+            mixers.forEach(mixer => {
+                mixer.timeScale = 0;
+            });
+        });
+        
+        document.getElementById('restart-btn').addEventListener('click', () => {
+            actions.forEach((action, idx) => {
+                action.time = 0;
+                mixers[idx].timeScale = 1;  // Ensure playback speed is normal
+                mixers[idx].update(0);  // Force update to show first frame
+            });
+            timelineSlider.value = 0;
+            updateTimeDisplay(0, animationDuration);
+            clock.getDelta();  // Reset clock
+            renderer.render(scene, camera);  // Force render
+            isPlaying = true;
+        });
+        
+        // Toggle labels function
+        function toggleLabels() {
+            labelsVisible = !labelsVisible;
+            labelSprites.forEach(sprite => {
+                sprite.visible = labelsVisible;
+            });
+            const btn = document.getElementById('toggle-labels-btn');
+            if (labelsVisible) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        }
+        
+        // Show details function
+        function showDetails(details, label) {
+            if (!details) return;
+            
+            const panel = document.getElementById('details-panel');
+            const content = document.getElementById('details-content');
+            
+            // Build details HTML
+            let html = '';
+            if (label) {
+                html += `<div class="detail-item"><div class="detail-label">Action:</div><div class="detail-value">${label}</div></div>`;
+            }
+            for (const [key, value] of Object.entries(details)) {
+                html += `<div class="detail-item"><div class="detail-label">${key}:</div><div class="detail-value">${value}</div></div>`;
+            }
+            
+            content.innerHTML = html;
+            panel.classList.add('visible');
+        }
+        
+        // Hide details function
+        function hideDetails() {
+            document.getElementById('details-panel').classList.remove('visible');
+        }
+        
+        // Toggle labels button
+        document.getElementById('toggle-labels-btn').addEventListener('click', toggleLabels);
+        
+        // Toggle details button (shows/hides panel)
+        document.getElementById('toggle-details-btn').addEventListener('click', () => {
+            const panel = document.getElementById('details-panel');
+            const btn = document.getElementById('toggle-details-btn');
+            if (panel.classList.contains('visible')) {
+                hideDetails();
+                btn.classList.remove('active');
+            } else {
+                // Show with default message
+                document.getElementById('details-content').innerHTML = '<p style="color: #999;">Click on a character to see details</p>';
+                panel.classList.add('visible');
+                btn.classList.add('active');
+            }
+        });
+        
+        // Close details button
+        document.getElementById('close-details').addEventListener('click', () => {
+            hideDetails();
+            document.getElementById('toggle-details-btn').classList.remove('active');
+        });
+        
+        // Raycaster for click detection
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        
+        // Click handler
+        renderer.domElement.addEventListener('click', (event) => {
+            // Calculate mouse position in normalized device coordinates
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            // Update raycaster
+            raycaster.setFromCamera(mouse, camera);
+            
+            // Check for intersections with clickable models
+            const intersects = raycaster.intersectObjects(clickableModels, true);
+            
+            if (intersects.length > 0) {
+                // Find the root model (not child mesh)
+                let targetModel = intersects[0].object;
+                while (targetModel.parent && !targetModel.userData.details) {
+                    targetModel = targetModel.parent;
+                }
+                
+                if (targetModel.userData && targetModel.userData.details) {
+                    showDetails(targetModel.userData.details, targetModel.userData.label);
+                    document.getElementById('toggle-details-btn').classList.add('active');
+                }
+            }
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (event) => {
+            // L key - toggle labels
+            if (event.key === 'l' || event.key === 'L') {
+                toggleLabels();
+            }
+            // I key - toggle info panel
+            if (event.key === 'i' || event.key === 'I') {
+                const btn = document.getElementById('toggle-details-btn');
+                btn.click();
+            }
+        });
+        
+        // Animation loop
+        const clock = new THREE.Clock();
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (isPlaying && !isScrubbing) {
+                const delta = clock.getDelta();
+                
+                // Update mixers first
+                mixers.forEach(mixer => {
+                    mixer.update(delta);
+                });
+                
+                // Check if we've reached the end after updating
+                let hasReachedEnd = false;
+                if (actions.length > 0 && animationDuration > 0) {
+                    const currentTime = actions[0].time || 0;
+                    if (currentTime >= animationDuration) {
+                        hasReachedEnd = true;
+                    }
+                }
+                
+                // If we reached the end, loop back to start
+                if (hasReachedEnd) {
+                    actions.forEach((action, idx) => {
+                        action.time = 0;
+                        mixers[idx].update(0);  // Force update to show first frame
+                    });
+                    timelineSlider.value = 0;
+                    updateTimeDisplay(0, animationDuration);
+                } else {
+                    // Update timeline scrubber to reflect current time
+                    updateTimelineFromMixer();
+                }
+            } else if (isScrubbing) {
+                // While scrubbing, consume the delta to keep clock in sync
+                clock.getDelta();
+            }
+            
+            controls.update();
+            renderer.render(scene, camera);
+        }
+        
+        animate();
+    </script>
+</body>
+</html>
+

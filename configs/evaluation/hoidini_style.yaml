@@ -1,0 +1,39 @@
+# HOIDINI-style evaluation configuration
+# This config demonstrates the HOIDINI paper metrics now integrated as conventions
+
+evaluation_name: "hoidini_style_evaluation"
+description: "HOIDINI paper evaluation using integrated conventions"
+
+metrics:
+  - name: "hoidini_foot_skating"
+    metric: "foot_skating"
+    convention: "hoidini_foot_skating"
+    description: "HOIDINI foot skating - lowest foot per frame, position displacement (auto-detects foot joints)"
+    params:
+      contact_threshold: 0.01  # 1cm threshold
+    
+  - name: "hoidini_ground_penetration"
+    metric: "ground_penetration"  
+    convention: "hoidini_floor_metrics"
+    description: "HOIDINI floor metrics - lowest foot per frame, multiple thresholds (auto-detects foot joints)"
+    params:
+      floor_height: 0.0
+    
+  - name: "hoidini_jerk"
+    metric: "jerk"
+    convention: "rms_jerk"
+    description: "RMS jerk (identical to HOIDINI implementation)"
+    params:
+      jerk_threshold: 500.0  # m/s³ - threshold for high jerk detection (motion capture with finite differences)
+    # HOIDINI jerk is mathematically identical to our RMS jerk
+
+  - name: "root_orientation_change"
+    metric: "root_orientation_change"
+    convention: "max_root_rotation"
+    description: "Root orientation stability - detects sudden rotation changes (jitter/tracking errors)"
+    params:
+      rotation_threshold_degrees: 45.0  # Threshold for ratio calculation (frames with >45° rotation)
+
+# Note: HOIDINI metrics use different aggregation strategies compared to our defaults:
+# - HOIDINI: Conservative approach using only the lowest/most critical foot per frame
+# - Our defaults: Comprehensive approach analyzing all specified joints independently

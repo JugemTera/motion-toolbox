@@ -1,0 +1,42 @@
+name: "StableMotion Compatible Evaluation"
+version: "1.0"
+
+metadata:
+  description: "Configuration compatible with StableMotion evaluation methodology"
+  reference: "StableMotion: Towards Generative 3D Human Motion Synthesis"
+  use_case: "Research comparison and benchmarking"
+  author: "Motion Toolbox"
+
+# Global parameters applied to all metrics (can be overridden per metric)
+global_params:
+  # Common thresholds
+  velocity_threshold: 0.02  # m/s
+  
+metrics:
+  - name: "foot_skating"
+    metric: "foot_skating"
+    convention: "displacement_based_contact"
+    description: "StableMotion-style displacement-based foot contact detection"
+    params:
+      displacement_threshold: 0.01  # 1cm threshold like StableMotion
+      
+  - name: "jerk"
+    metric: "jerk"
+    convention: "mean_jerk"
+    description: "Mean jerk calculation matching StableMotion formula"
+    params:
+      jerk_threshold: 10.0  # StableMotion uses /10.0 scaling, adjusted threshold
+    
+  - name: "ground_penetration"
+    metric: "ground_penetration" 
+    convention: "simple_height_check"
+    description: "Simple ground penetration detection"
+    params:
+      ground_height: 0.0
+
+  - name: "root_orientation_change"
+    metric: "root_orientation_change"
+    convention: "max_root_rotation"
+    description: "Root orientation stability - detects sudden rotation changes (jitter/tracking errors)"
+    params:
+      rotation_threshold_degrees: 45.0  # Threshold for ratio calculation (frames with >45° rotation)

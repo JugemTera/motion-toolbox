@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{title}}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+            color: #333;
+            overflow: hidden;
+        }
+        #container { width: 100vw; height: 100vh; position: relative; }
+        #controls {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 12px; align-items: center; z-index: 100;
+            background: rgba(40, 40, 40, 0.85); padding: 12px 20px; border-radius: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .ctrl-btn {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15); border: none;
+            cursor: pointer; font-size: 14px; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+        }
+        .ctrl-btn:hover { background: rgba(255, 255, 255, 0.25); }
+        #timeline {
+            width: 200px; height: 4px;
+            -webkit-appearance: none; appearance: none;
+            background: rgba(255, 255, 255, 0.2); border-radius: 2px; outline: none;
+        }
+        #timeline::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 14px; height: 14px; background: #fff;
+            border-radius: 50%; cursor: pointer;
+        }
+        #timeline::-moz-range-thumb {
+            width: 14px; height: 14px; background: #fff;
+            border-radius: 50%; cursor: pointer; border: none;
+        }
+        #frameInfo {
+            color: #fff; font-size: 12px; font-weight: 500;
+            min-width: 90px; text-align: center; opacity: 0.9;
+            display: flex; flex-direction: column; line-height: 1.4;
+        }
+        #timeInfo { font-size: 13px; font-weight: 600; }
+        #frameDisplay { font-size: 11px; opacity: 0.7; }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <div id="controls">
+        <button class="ctrl-btn" id="playBtn">▶</button>
+        <button class="ctrl-btn" id="resetBtn">⏮</button>
+        <input type="range" id="timeline" min="0" max="{{num_frames_max}}" value="0">
+        <div id="frameInfo">
+            <div id="timeInfo">0.00s</div>
+            <div id="frameDisplay"><span id="frameNum">0</span> / {{num_frames_max}}</div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        const positions = {{positions_json}};
+        const chains = {{chains_json}};
+        const chainColors = {{colors_json}};
+        const fps = {{fps}};
+        const numFrames = {{num_frames}};
+        const JOINT_RADIUS = {{joint_radius}};
+        const BONE_RADIUS = {{bone_radius}};
+
+        // Compute bounding box, sampled every 5 frames for speed
+        let minX=Infinity, minY=Infinity, minZ=Infinity;
+        let maxX=-Infinity, maxY=-Infinity, maxZ=-Infinity;
+        for (let f=0; f<numFrames; f+=5) {
+            positions[f].forEach(j => {
+                if (j[0]!==0||j[1]!==0||j[2]!==0) {
+                    if(j[0]<minX) minX=j[0]; if(j[0]>maxX) maxX=j[0];
+                    if(j[1]<minY) minY=j[1]; if(j[1]>maxY) maxY=j[1];
+                    if(j[2]<minZ) minZ=j[2]; if(j[2]>maxZ) maxZ=j[2];
+                }
+            });
+        }
+        if (minX===Infinity) { minX=maxX=minY=maxY=minZ=maxZ=0; }
+        const bb = {
+            cx:(minX+maxX)/2, cy:(minY+maxY)/2, cz:(minZ+maxZ)/2,
+            xspan:maxX-minX, yspan:maxY-minY, zspan:maxZ-minZ,
+            span:Math.max(maxX-minX, maxY-minY, maxZ-minZ)||1
+        };
+        // Camera distance: span * 2 fits the whole scene at 60° FOV with comfortable margin.
+        // Minimum of JOINT_RADIUS * 80 ensures tiny skeletons are still visible.
+        const camDist = Math.max(bb.span * 2.0, JOINT_RADIUS * 80);
+
+        // Scene setup
+        const container = document.getElementById('container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xffffff);
+
+        // Fixed 1cm near plane avoids depth-buffer precision issues at small scale.
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, camDist * 50);
+        camera.position.set(bb.cx + camDist * 0.5, bb.cy + camDist * 0.4, bb.cz + camDist);
+        camera.lookAt(bb.cx, bb.cy, bb.cz);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        container.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.target.set(bb.cx, bb.cy, bb.cz);
+        controls.update();
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+        scene.add(ambientLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+        dirLight.position.set(bb.cx + bb.span * 3, bb.cy + bb.span * 5, bb.cz + bb.span * 3);
+        scene.add(dirLight);
+
+        // Checkerboard floor — scaled to the skeleton's footprint
+        const floorSize = Math.max(bb.span * 6, 0.5);
+        const geometry = new THREE.PlaneGeometry(floorSize, floorSize);
+        geometry.rotateX(-Math.PI / 2);
+        geometry.translate(bb.cx, bb.cy - bb.span * 0.5, bb.cz);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 512; canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+        const checks = 20;
+        const checkSize = canvas.width / checks;
+        for (let i = 0; i < checks; i++) {
+            for (let j = 0; j < checks; j++) {
+                ctx.fillStyle = (i + j) % 2 === 0 ? '#cccccc' : '#eeeeee';
+                ctx.fillRect(i * checkSize, j * checkSize, checkSize, checkSize);
+            }
+        }
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.encoding = THREE.sRGBEncoding;
+        const material = new THREE.MeshBasicMaterial({ map: texture });
+        const floor = new THREE.Mesh(geometry, material);
+        scene.add(floor);
+
+        // Create skeleton
+        const group = new THREE.Group();
+        const jointGeom = new THREE.SphereGeometry(JOINT_RADIUS, 12, 8);
+        const jointMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+
+        const joints = [];
+        const jointIndices = new Set();
+        chains.forEach(chain => chain.forEach(idx => jointIndices.add(idx)));
+
+        const numJoints = positions[0].length;
+        for (let i = 0; i < numJoints; i++) {
+            if (jointIndices.has(i)) {
+                const joint = new THREE.Mesh(jointGeom, jointMat);
+                joints[i] = joint;
+                group.add(joint);
+            }
+        }
+
+        const bones = [];
+        chains.forEach((chain, chainIdx) => {
+            const color = new THREE.Color(chainColors[chainIdx]);
+            const mat = new THREE.MeshLambertMaterial({ color: color });
+            for (let i = 0; i < chain.length - 1; i++) {
+                const geom = new THREE.CylinderGeometry(BONE_RADIUS, BONE_RADIUS, 1, 8);
+                const cylinder = new THREE.Mesh(geom, mat);
+                bones.push({ mesh: cylinder, from: chain[i], to: chain[i + 1] });
+                group.add(cylinder);
+            }
+        });
+        scene.add(group);
+
+        const tmpVec = new THREE.Vector3();
+        const upVec = new THREE.Vector3(0, 1, 0);
+
+        function updateSkeleton(frame) {
+            const pos = positions[frame];
+            for (let i = 0; i < joints.length; i++) {
+                if (joints[i] && i < pos.length) {
+                    joints[i].position.set(pos[i][0], pos[i][1], pos[i][2]);
+                }
+            }
+            bones.forEach((bone) => {
+                const fromPos = pos[bone.from];
+                const toPos = pos[bone.to];
+                bone.mesh.position.set(
+                    (fromPos[0] + toPos[0]) / 2,
+                    (fromPos[1] + toPos[1]) / 2,
+                    (fromPos[2] + toPos[2]) / 2
+                );
+                tmpVec.set(toPos[0] - fromPos[0], toPos[1] - fromPos[1], toPos[2] - fromPos[2]);
+                const length = tmpVec.length();
+                bone.mesh.scale.set(1, length, 1);
+                if (length > 0.001) {
+                    tmpVec.normalize();
+                    const quaternion = new THREE.Quaternion();
+                    quaternion.setFromUnitVectors(upVec, tmpVec);
+                    bone.mesh.quaternion.copy(quaternion);
+                }
+            });
+        }
+
+        let currentFrame = 0;
+        let playing = true;
+        let lastTime = 0;
+        const frameInterval = 1000 / fps;
+
+        const playBtn = document.getElementById('playBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const frameNum = document.getElementById('frameNum');
+        const timeInfo = document.getElementById('timeInfo');
+        const timeline = document.getElementById('timeline');
+
+        function updateDisplay(frame) {
+            frameNum.textContent = frame;
+            timeline.value = frame;
+            timeInfo.textContent = (frame / fps).toFixed(2) + 's';
+        }
+
+        playBtn.textContent = '⏸';
+
+        playBtn.addEventListener('click', () => {
+            playing = !playing;
+            playBtn.textContent = playing ? '⏸' : '▶';
+        });
+
+        resetBtn.addEventListener('click', () => {
+            currentFrame = 0;
+            updateDisplay(currentFrame);
+            playing = false;
+            playBtn.textContent = '▶';
+        });
+
+        timeline.addEventListener('input', (e) => {
+            currentFrame = parseInt(e.target.value);
+            updateDisplay(currentFrame);
+            playing = false;
+            playBtn.textContent = '▶';
+        });
+
+        function animate(time) {
+            requestAnimationFrame(animate);
+            if (playing && time - lastTime > frameInterval) {
+                currentFrame = (currentFrame + 1) % numFrames;
+                updateDisplay(currentFrame);
+                lastTime = time;
+            }
+            updateSkeleton(currentFrame);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        updateSkeleton(0);
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate(0);
+    </script>
+</body>
+</html>
