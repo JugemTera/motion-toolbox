@@ -224,9 +224,9 @@ class TestGenerateShowcase:
         print("=" * 60)
 
         # Generate the styled index
-        self._generate_roblox_index(output_dir)
+        self._generate_index(output_dir)
 
-    def _generate_roblox_index(self, output_dir: Path):
+    def _generate_index(self, output_dir: Path):
         """Generate styled black and white index page."""
         html = """<!DOCTYPE html>
 <html lang="en">

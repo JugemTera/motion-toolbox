@@ -53,9 +53,7 @@ def motion_collate(batch: list[Any]) -> dict[str, Any]:
     (i.e. the same skeleton). A :class:`ValueError` is raised otherwise.
     """
     if not _HAS_TORCH:
-        raise ImportError(
-            "motion_collate requires PyTorch. Install with: pip install 'motion-toolbox[ml]'"
-        )
+        raise ImportError("motion_collate requires PyTorch. Install with: pip install 'motion-toolbox[ml]'")
     if not batch:
         raise ValueError("motion_collate received an empty batch.")
 
@@ -68,9 +66,7 @@ def motion_collate(batch: list[Any]) -> dict[str, Any]:
 
     num_joints_set = {m.joint_rotations.shape[1] for m in motions}
     if len(num_joints_set) != 1:
-        raise ValueError(
-            f"All motions in a batch must share the same number of joints, got {sorted(num_joints_set)}"
-        )
+        raise ValueError(f"All motions in a batch must share the same number of joints, got {sorted(num_joints_set)}")
     num_joints = next(iter(num_joints_set))
 
     lengths = [int(m.joint_rotations.shape[0]) for m in motions]

@@ -339,7 +339,9 @@ print(f"Acceleration range: [{accelerations.min():.4f}, {accelerations.max():.4f
 
 ## Configuration Files
 
-For detailed information about YAML configuration files, see the [Configuration System Guide](CONFIG_SYSTEM.md).
+YAML evaluator configurations live in `configs/evaluation/` (for example
+`comprehensive.yaml`, `stablemotion_compatible.yaml`, `semantic.yaml`).
+See [EVALUATION_GUIDE.md](EVALUATION_GUIDE.md) for usage patterns.
 
 Key benefits of the configuration approach:
 - **📁 File-based**: Store evaluation setups in version-controlled YAML files

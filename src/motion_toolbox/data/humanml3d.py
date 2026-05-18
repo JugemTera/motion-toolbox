@@ -69,10 +69,7 @@ class HumanML3DDataset(_TorchDataset):  # type: ignore[misc,valid-type]
         transform: Callable[[np.ndarray], np.ndarray] | None = None,
     ) -> None:
         if not _HAS_TORCH:
-            raise ImportError(
-                "HumanML3DDataset requires PyTorch. Install with: "
-                "pip install 'motion-toolbox[ml]'"
-            )
+            raise ImportError("HumanML3DDataset requires PyTorch. Install with: pip install 'motion-toolbox[ml]'")
 
         self.root = Path(root).expanduser().resolve()
         if not self.root.exists():
@@ -96,9 +93,7 @@ class HumanML3DDataset(_TorchDataset):  # type: ignore[misc,valid-type]
             primary = [p for p in primary if p.stem in wanted]
 
         if not primary:
-            raise FileNotFoundError(
-                f"No HumanML3D feature files (<id>.npy) found under {self.root}"
-            )
+            raise FileNotFoundError(f"No HumanML3D feature files (<id>.npy) found under {self.root}")
         self.files: list[Path] = primary
 
         mean_path = self.root / "Mean.npy"
@@ -120,8 +115,7 @@ class HumanML3DDataset(_TorchDataset):  # type: ignore[misc,valid-type]
         features = np.load(path)
         if features.ndim != 2 or features.shape[-1] != self.feature_dim:
             raise ValueError(
-                f"Expected feature array of shape (T, {self.feature_dim}) for {path}, "
-                f"got {features.shape}"
+                f"Expected feature array of shape (T, {self.feature_dim}) for {path}, got {features.shape}"
             )
         if self.transform is not None:
             features = self.transform(features)
@@ -129,11 +123,7 @@ class HumanML3DDataset(_TorchDataset):  # type: ignore[misc,valid-type]
         text_path = path.with_suffix(".txt")
         captions: list[str] = []
         if text_path.exists():
-            captions = [
-                line.strip()
-                for line in text_path.read_text(encoding="utf-8").splitlines()
-                if line.strip()
-            ]
+            captions = [line.strip() for line in text_path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
         joints_path = self.root / f"{sample_id}_joints.npy"
         joints: np.ndarray | None = np.load(joints_path) if joints_path.exists() else None

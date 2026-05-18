@@ -39,10 +39,10 @@ DEFAULT_DEST = REPO_ROOT / "sample_data" / "format_272"
 # ---------------------------------------------------------------------------
 # CONFIGURE ME
 # ---------------------------------------------------------------------------
-DEFAULT_HF_USER = "<HF_USER>"                # e.g. "your-org"
-DEFAULT_DATASET = "<DATASET_NAME>"           # e.g. "motion-toolbox-samples"
+DEFAULT_HF_USER = "<HF_USER>"  # e.g. "your-org"
+DEFAULT_DATASET = "<DATASET_NAME>"  # e.g. "motion-toolbox-samples"
 DEFAULT_REVISION = "main"
-DEFAULT_SUBDIR = "format_272"                # subdirectory inside the HF repo
+DEFAULT_SUBDIR = "format_272"  # subdirectory inside the HF repo
 # ---------------------------------------------------------------------------
 
 

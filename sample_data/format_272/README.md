@@ -1,7 +1,7 @@
 # 272-Dimensional Motion Representation Sample Data
 
 Each `.npy` file has shape `(frames, 272)` with layout described in
-[docs/272_FORMAT_REFERENCE.md](../docs/272_FORMAT_REFERENCE.md).
+[docs/272_FORMAT_REFERENCE.md](../../docs/272_FORMAT_REFERENCE.md).
 
 ## Sources
 

@@ -84,10 +84,7 @@ class MotionFolderDataset(_TorchDataset):  # type: ignore[misc,valid-type]
         return_motion_only: bool = False,
     ) -> None:
         if not _HAS_TORCH:
-            raise ImportError(
-                "MotionFolderDataset requires PyTorch. Install with: "
-                "pip install 'motion-toolbox[ml]'"
-            )
+            raise ImportError("MotionFolderDataset requires PyTorch. Install with: pip install 'motion-toolbox[ml]'")
         self.root = Path(root).expanduser().resolve()
         if not self.root.exists():
             raise FileNotFoundError(f"Dataset root not found: {self.root}")
@@ -141,6 +138,5 @@ class MotionFolderDataset(_TorchDataset):  # type: ignore[misc,valid-type]
 
     def __repr__(self) -> str:
         return (
-            f"MotionFolderDataset(root={self.root!s}, pattern={self.pattern!r}, "
-            f"format={self.format!r}, n={len(self)})"
+            f"MotionFolderDataset(root={self.root!s}, pattern={self.pattern!r}, format={self.format!r}, n={len(self)})"
         )

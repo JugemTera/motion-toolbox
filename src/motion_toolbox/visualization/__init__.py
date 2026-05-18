@@ -185,5 +185,3 @@ def get_glb_exporter(model_path, **kwargs):
     from .glb_exporter import GLBExporter
 
     return GLBExporter(model_path, **kwargs)
-
-
