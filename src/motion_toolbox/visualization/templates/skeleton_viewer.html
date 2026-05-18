@@ -122,11 +122,19 @@
         dirLight.position.set(bb.cx + bb.span * 3, bb.cy + bb.span * 5, bb.cz + bb.span * 3);
         scene.add(dirLight);
 
-        // Checkerboard floor — scaled to the skeleton's footprint
+        // Checkerboard floor — sized to the skeleton's footprint and
+        // anchored to the minimum world-Y of the motion so the figure rests
+        // on the floor instead of floating above (or sinking below) it.
+        // Avoids the "root looks pinned to Y=0" artifact that occurs when
+        // the bbox span is dominated by XZ travel: the centroid-based floor
+        // placement would otherwise drop the floor well below the feet.
         const floorSize = Math.max(bb.span * 6, 0.5);
         const geometry = new THREE.PlaneGeometry(floorSize, floorSize);
         geometry.rotateX(-Math.PI / 2);
-        geometry.translate(bb.cx, bb.cy - bb.span * 0.5, bb.cz);
+        // Use minY directly; subtract a small epsilon (0.5% of yspan) to avoid
+        // z-fighting between the floor plane and any joint resting exactly on it.
+        const floorY = minY - Math.max(bb.yspan * 0.005, 1e-4);
+        geometry.translate(bb.cx, floorY, bb.cz);
 
         const canvas = document.createElement('canvas');
         canvas.width = 512; canvas.height = 512;

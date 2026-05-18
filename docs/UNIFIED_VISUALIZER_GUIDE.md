@@ -147,6 +147,14 @@ Works with ALL formats:
 - ✅ Joint positions
 - ✅ SMPL parameters
 
+**Coordinate frame.** The skeleton viewer assumes a Y-up frame and anchors
+the checkerboard floor to the minimum Y of the motion across all frames
+(minus a tiny epsilon to avoid z-fighting). Make sure your data has the
+feet near Y = 0; SMPL forward kinematics in this package already
+guarantees this, but if you feed in arbitrary joint positions, apply your
+own floor alignment first (see `Motion.floor_align` / `floor_alignment`
+in `Motion.from_quaternions`).
+
 ### Mesh Visualization
 
 | Format | SMPL | MHR |
