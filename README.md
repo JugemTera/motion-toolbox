@@ -62,7 +62,7 @@ transforms, and using the collated batches for training).
 
 ## Installation
 
-From a clone of [the public repository](https://github.com/<github-org>/motion-toolbox) (update the URL when published):
+From a clone of [the public repository](https://github.com/RoMoDataset/motion-toolbox):
 
 ```bash
 cd motion_toolbox

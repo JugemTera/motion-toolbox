@@ -41,9 +41,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/<github-org>/motion-toolbox"
-Repository = "https://github.com/<github-org>/motion-toolbox"
-Issues = "https://github.com/<github-org>/motion-toolbox/issues"
+Homepage = "https://github.com/RoMoDataset/motion-toolbox"
+Repository = "https://github.com/RoMoDataset/motion-toolbox"
+Issues = "https://github.com/RoMoDataset/motion-toolbox/issues"
 
 [project.optional-dependencies]
 ml = [
