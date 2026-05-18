@@ -2,7 +2,7 @@
 
 This module exposes :class:`torch.utils.data.Dataset` subclasses that wrap
 :func:`motion_toolbox.io.load_motion` so users can train and evaluate models
-directly against directories of motion files (HumanML3D, the ROMO 272-D
+directly against directories of motion files (HumanML3D, the RoMo 272-D
 corpus, AMASS-SMPL, GVHMR, STMC, ALIGN, MHR — anything ``load_motion`` can
 parse).
 

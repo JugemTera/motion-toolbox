@@ -1,7 +1,7 @@
 [project]
 name = "motion-toolbox"
 version = "0.1.0"
-description = "Python library for 3D character motion processing, visualization, and evaluation (ROMO research codebase)."
+description = "Python library for 3D character motion processing, visualization, and evaluation (RoMo research codebase, CVPR 2026)."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "CC-BY-NC-4.0" }
@@ -44,6 +44,7 @@ dependencies = [
 Homepage = "https://github.com/RoMoDataset/motion-toolbox"
 Repository = "https://github.com/RoMoDataset/motion-toolbox"
 Issues = "https://github.com/RoMoDataset/motion-toolbox/issues"
+"Project page" = "https://davidzhang73.github.io/romo-website"
 
 [project.optional-dependencies]
 ml = [

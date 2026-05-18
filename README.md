@@ -19,7 +19,7 @@ A Python library for 3D character animation and motion processing, supporting mu
 
 ## Project status
 
-Research code for the **ROMO** project: APIs may change between releases. Not intended for production use without your own hardening.
+Research code for the **RoMo** project (CVPR 2026): APIs may change between releases. Not intended for production use without your own hardening.
 
 ## Dataset
 
@@ -460,16 +460,17 @@ For CUDA PyTorch, install wheels from the [PyTorch index](https://download.pytor
 
 ## Citation
 
-If you use this software, please cite the ROMO paper (update with venue / year / DOI when available):
+If you use this software or the RoMo dataset, please cite our CVPR 2026 paper. Project page: <https://davidzhang73.github.io/romo-website>.
 
 ```bibtex
-@article{romo2026,
-  title   = {ROMO: Title Placeholder},
-  author  = {Zhang, Jiahao and Liu, Joseph and Lee, Young-Yoon and Moon, Seonghyeon and
-             Zordan, Victor and Tevet, Guy and Liu, C. Karen and Gould, Stephen and
-             Jacob, Oren and Jiang, Haomiao and Kapadia, Mubbasir and Ben{-}Shabat, Yizhak},
-  journal = {TODO},
-  year    = {2026}
+@inproceedings{zhang2026romo,
+  title     = {{RoMo}: A Large-Scale, Richly Organized Dataset and Semantic Taxonomy for Human Motion Generation},
+  author    = {Zhang, Jiahao and Liu, Joseph and Lee, Young-Yoon and Moon, Seonghyeon and
+               Zordan, Victor and Tevet, Guy and Liu, C. Karen and Gould, Stephen and
+               Jacob, Oren and Jiang, Haomiao and Kapadia, Mubbasir and Ben{-}Shabat, Yizhak},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year      = {2026},
+  url       = {https://davidzhang73.github.io/romo-website}
 }
 ```
 

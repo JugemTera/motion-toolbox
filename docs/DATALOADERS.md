@@ -58,7 +58,7 @@ The collate function pads to the longest sequence in the batch and
 produces a boolean ``mask`` you can feed into transformer attention or
 loss masking.
 
-## 272-D dataset (MotionMillion / ROMO format)
+## 272-D dataset (MotionMillion / RoMo format)
 
 ```python
 from motion_toolbox.data import Format272Dataset
