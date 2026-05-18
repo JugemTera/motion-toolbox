@@ -129,17 +129,6 @@ class TestGenerateShowcase:
         except Exception as e:
             print(f"   Skipped SMPL Mesh: {e}")
 
-        # 8. R15 Mesh Visualization (Roblox format)
-        print("\n8. R15 Mesh (Roblox)...")
-        try:
-            path8 = vis_mesh.visualize(
-                motion_mesh, output_dir / "r15_mesh.html", mode="mesh", body_model="r15", fps=30, title="R15 Mesh"
-            )
-            assert path8.exists()
-            print(f"   Created: r15_mesh.html ({motion_mesh.num_frames} frames)")
-        except Exception as e:
-            print(f"   Skipped R15 Mesh: {e}")
-
         # 9. 205D (STMC) Skeleton Visualization
         print("\n9. STMC 205D Skeleton...")
         try:
@@ -234,11 +223,11 @@ class TestGenerateShowcase:
         print(f"SUCCESS: 14 visualizations generated in {output_dir.absolute()}")
         print("=" * 60)
 
-        # Generate the Roblox-styled index
+        # Generate the styled index
         self._generate_roblox_index(output_dir)
 
     def _generate_roblox_index(self, output_dir: Path):
-        """Generate Roblox-styled black and white index page."""
+        """Generate styled black and white index page."""
         html = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -541,15 +530,6 @@ class TestGenerateShowcase:
                     <span class="description">50 frames</span>
                 </div>
                 <iframe src="smpl_mesh.html" class="viz-iframe"></iframe>
-            </div>
-            
-            <div class="viz-card">
-                <div class="viz-header">
-                    <span class="format-badge">R15</span>
-                    <h3>Roblox Avatar</h3>
-                    <span class="description">50 frames</span>
-                </div>
-                <iframe src="r15_mesh.html" class="viz-iframe"></iframe>
             </div>
             
             <div class="viz-card">

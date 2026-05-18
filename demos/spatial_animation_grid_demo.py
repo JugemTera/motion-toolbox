@@ -19,7 +19,6 @@ Default Settings (optimized for research papers):
 - Enhanced antialiasing
 """
 
-import os
 import sys
 from pathlib import Path
 

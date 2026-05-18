@@ -18,7 +18,6 @@ def _get_foot_joint_indices(skeleton: Skeleton) -> list[int]:
 
     Handles different naming conventions:
     - SMPL: "left_foot", "right_foot", "left_ankle", "right_ankle"
-    - R15: "LeftFoot", "RightFoot"
 
     Args:
         skeleton: Skeleton to search for foot joints
@@ -56,13 +55,9 @@ def _detect_skeleton_type(skeleton: Skeleton) -> str:
         skeleton: Skeleton to analyze
 
     Returns:
-        "smpl", "r15", or "unknown"
+        "smpl" or "unknown"
     """
     joint_names_lower = [name.lower() for name in skeleton.joint_names]
-
-    # R15 has specific joint names like "LowerTorso", "UpperTorso"
-    if any("lowertorso" in name or "uppertorso" in name for name in joint_names_lower):
-        return "r15"
 
     # SMPL has joints like "pelvis", "spine1", "spine2", "spine3"
     if any("pelvis" in name or "spine1" in name for name in joint_names_lower):
@@ -76,7 +71,6 @@ def _get_default_mesh_offset(skeleton: Skeleton) -> float:
 
     The foot joint (ankle) is not at the bottom of the foot mesh.
     - SMPL: Mesh extends ~0.02-0.03m below the ankle joint
-    - R15: Mesh may be positioned differently, needs negative offset
 
     Args:
         skeleton: Skeleton to get offset for
@@ -89,9 +83,6 @@ def _get_default_mesh_offset(skeleton: Skeleton) -> float:
     if skeleton_type == "smpl":
         # SMPL foot mesh extends below ankle joint
         return 0.01  # ~1cm up
-    elif skeleton_type == "r15":
-        # R15 needs downward adjustment
-        return -0.05  # ~5cm down
     else:
         return 0.0  # No adjustment for unknown skeletons
 
@@ -214,7 +205,6 @@ def remove_vertical_motion(
                      Positive = move character up, Negative = move down.
                      If None, auto-detects based on skeleton type:
                      - SMPL: +0.025m (mesh below ankle)
-                     - R15: -0.02m (needs downward adjustment)
 
     Returns:
         New Motion object with vertical motion removed (floor-aligned)

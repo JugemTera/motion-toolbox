@@ -41,7 +41,7 @@ def main():
     # Create visualization
     output_dir = project_root / "outputs" / "mhr_demo"
 
-    print(f"\n🎬 Creating visualization...")
+    print("\n🎬 Creating visualization...")
 
     create_spatial_animation_grid(
         motion_paths=[str(f) for f in mhr_files],

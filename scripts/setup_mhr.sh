@@ -47,8 +47,8 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 if [ ! -f "$PROJECT_ROOT/pyproject.toml" ]; then
     echo "❌ Could not find pyproject.toml in $PROJECT_ROOT"
     echo ""
-    echo "Please run this script from the project directory:"
-    echo "  cd /path/to/motion_toolbox"
+    echo "Please run this script from the repository root:"
+    echo "  cd /path/to/motion-toolbox"
     echo "  bash scripts/setup_mhr.sh"
     exit 1
 fi

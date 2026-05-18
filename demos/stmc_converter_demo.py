@@ -9,19 +9,20 @@ It validates the reconstruction quality by:
 """
 
 import argparse
-import numpy as np
-import torch
 import sys
 from pathlib import Path
+
+import numpy as np
+import torch
 
 # Add motion_toolbox to path for imports
 _REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_REPO / "src"))
 
 from motion_toolbox.converters.stmc_converter import STMC205Converter
+from motion_toolbox.core.identity import Identity
 from motion_toolbox.core.motion import Motion
 from motion_toolbox.core.skeleton import Skeleton
-from motion_toolbox.core.identity import Identity
 from motion_toolbox.visualization.html_viewer import create_motion_visualization
 
 
@@ -211,14 +212,14 @@ def main():
     print(f"   - FPS: {motion_original.framerate}")
     
     # Initialize converter
-    print(f"\n2. Initializing STMC converter")
+    print("\n2. Initializing STMC converter")
     converter = STMC205Converter(
         smpl_model_path=args.body_model_path,
         device='cpu',
     )
     
     # Forward conversion (Motion -> STMC features)
-    print(f"\n3. Converting Motion to STMC 205D features (forward)")
+    print("\n3. Converting Motion to STMC 205D features (forward)")
     features = converter.forward(motion_original)
     print(f"   - Features shape: {features.shape}")
     print(f"   - Expected: ({motion_original.num_frames}, 205)")
@@ -227,7 +228,7 @@ def main():
     assert features.shape == (motion_original.num_frames, 205), "Feature shape mismatch!"
     
     # Print feature statistics
-    print(f"\n4. Feature statistics:")
+    print("\n4. Feature statistics:")
     feature_ranges = {
         'Root Linear Vel (XZ)': features[:, 0:2],
         'Root Angular Vel (Y)': features[:, 2:3],
@@ -240,27 +241,27 @@ def main():
         print(f"   {name:25s}: min={feat.min().item():.4f}, max={feat.max().item():.4f}, mean={feat.mean().item():.4f}")
     
     # Inverse conversion (STMC features -> Motion)
-    print(f"\n5. Converting STMC features back to Motion (inverse)")
+    print("\n5. Converting STMC features back to Motion (inverse)")
     motion_reconstructed = converter.inverse(features, skeleton=motion_original.skeleton)
     print(f"   - Frames: {motion_reconstructed.num_frames}")
     print(f"   - Joints: {motion_reconstructed.num_joints}")
     
     # Compute metrics
-    print(f"\n6. Computing reconstruction metrics:")
+    print("\n6. Computing reconstruction metrics:")
     metrics = compute_metrics(motion_original, motion_reconstructed)
     
-    print(f"   Root Translation:")
+    print("   Root Translation:")
     print(f"     - MSE:  {metrics['root_translation_mse']:.6f} m²")
     print(f"     - RMSE: {metrics['root_translation_rmse']:.6f} m")
-    print(f"   Joint Rotations:")
+    print("   Joint Rotations:")
     print(f"     - MSE:  {metrics['joint_rotation_mse']:.6f} rad²")
     print(f"     - RMSE: {metrics['joint_rotation_rmse']:.6f} rad")
-    print(f"   Joint Positions (FK):")
+    print("   Joint Positions (FK):")
     print(f"     - MSE:  {metrics['position_mse']:.6f} m²")
     print(f"     - RMSE: {metrics['position_rmse']:.6f} m")
     
     # Critical validation check
-    print(f"\n7. Validation status:")
+    print("\n7. Validation status:")
     if metrics['root_translation_rmse'] < 0.05:  # Less than 5cm error is acceptable
         print(f"   ✓ PASS: Root translation error is acceptable ({metrics['root_translation_rmse']*100:.2f} cm)")
     else:
@@ -272,7 +273,7 @@ def main():
         print(f"   ⚠ WARNING: Joint rotation error is high ({np.degrees(metrics['joint_rotation_rmse']):.2f}°)")
     
     # Visualize both motions
-    print(f"\n8. Generating visualizations:")
+    print("\n8. Generating visualizations:")
     output_dir = Path(args.output_dir)
     output_dir.mkdir(exist_ok=True, parents=True)
     
@@ -395,9 +396,9 @@ def main():
     with open(comparison_output, 'w') as f:
         f.write(html_content)
     
-    print(f"\n" + "=" * 80)
+    print("\n" + "=" * 80)
     print(f"Done! Open {comparison_output} in your browser to view the comparison.")
-    print(f"=" * 80)
+    print("=" * 80)
 
 
 if __name__ == '__main__':

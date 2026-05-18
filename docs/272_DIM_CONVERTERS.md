@@ -36,7 +36,7 @@ Converts SMPL parameters to 272-dimensional motion representation.
 #### Usage
 
 ```python
-from converters.motion_converters import SMPLTo272Converter
+from motion_toolbox.converters.motion_converters import SMPLTo272Converter
 import numpy as np
 
 # Initialize converter
@@ -85,7 +85,7 @@ Converts 272-dimensional motion representation to SMPL parameters.
 #### Usage
 
 ```python
-from converters.motion_converters import Format272ToSMPLConverter
+from motion_toolbox.converters.motion_converters import Format272ToSMPLConverter
 
 # Initialize converter
 converter = Format272ToSMPLConverter(body_model_path="/path/to/body_models")
@@ -128,7 +128,7 @@ This approach ensures consistency and reuses well-tested code.
 Both converters are registered in the factory function:
 
 ```python
-from converters.motion_converters import get_motion_converter
+from motion_toolbox.converters.motion_converters import get_motion_converter
 
 # Get SMPL to 272D converter
 converter = get_motion_converter("smpl2format272", body_model_path="/path/to/models")
@@ -137,7 +137,7 @@ converter = get_motion_converter("smpl2format272", body_model_path="/path/to/mod
 converter = get_motion_converter("format272tosmpl", body_model_path="/path/to/models")
 
 # List all available converters
-from converters.motion_converters import list_converters
+from motion_toolbox.converters.motion_converters import list_converters
 print(list_converters())
 ```
 
@@ -184,7 +184,7 @@ pytest tests/test_272_converters.py -v
 pytest tests/test_272_converters.py::TestSMPLTo272Converter -v
 
 # Run with coverage
-pytest tests/test_272_converters.py --cov=converters --cov-report=html
+pytest tests/test_272_converters.py --cov=motion_toolbox.converters --cov-report=html
 ```
 
 Test coverage includes:

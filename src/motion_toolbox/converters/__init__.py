@@ -6,7 +6,6 @@ This module provides converters for transforming between motion representations.
 - GVHMR → Motion (fully implemented and tested)
 - Motion → GVHMR (conversion for pipeline integration)
 - Motion → SMPL (basic implementation for axis-angle export)
-- SMPL → R15 (convert SMPL motion to Roblox R15 format)
 - HumanML3D ↔ SMPL (bidirectional conversion with SMPLify3D)
 
 For a complete list of converters and their status, use `list_converters()`.
@@ -32,7 +31,6 @@ from .motion_converters import (
     MotionToMHRConverter,
     MotionToSMPLConverter,
     SMPLToMotionConverter,
-    SMPLToR15Converter,
     # Utility functions
     get_motion_converter,
     list_converters,
@@ -53,7 +51,6 @@ __all__ = [
     "MotionToSMPLConverter",
     "MHRToMotionConverter",
     "MotionToMHRConverter",
-    "SMPLToR15Converter",
     # HumanML3D ↔ SMPL
     "HumanML3DToSMPLConverter",
     "SMPLToHumanML3DConverter",
@@ -68,7 +65,6 @@ __all__ = [
     "MotionToHumanML3DConverter",
     "HumanML3DToMotionConverter",
     "SMPLToMotionConverter",
-    # TODO: Implement MotionToSTMCConverter and STMCToMotionConverter https://github.com/nv-tlabs/stmc
     # Utility functions
     "get_motion_converter",
     "list_converters",

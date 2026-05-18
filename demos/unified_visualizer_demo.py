@@ -4,16 +4,17 @@ This demo showcases the new unified visualization system that works
 across all motion formats and body models with a single, consistent API.
 """
 
-import numpy as np
-from pathlib import Path
 import sys
+from pathlib import Path
+
+import numpy as np
 
 # Add parent to path for imports
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
+from motion_toolbox.core import Motion, Skeleton
 from motion_toolbox.visualization import Visualizer
 from motion_toolbox.visualization.constants import DEFAULT_FPS
-from motion_toolbox.core import Motion, Skeleton
 
 
 def main():
@@ -95,7 +96,7 @@ def main():
     # Demo 6: Export scene data for frontend
     print("6. Exporting scene data for frontend integration...")
     scene_data = vis.to_scene_data(data_263d, mode='skeleton', fps=DEFAULT_FPS)
-    print(f"   ✓ Scene data exported:")
+    print("   ✓ Scene data exported:")
     print(f"      - Type: {scene_data['type']}")
     print(f"      - Frames: {scene_data['num_frames']}")
     print(f"      - Joints: {scene_data['num_joints']}")

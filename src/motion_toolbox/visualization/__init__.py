@@ -77,15 +77,6 @@ except ImportError:
     GLB_AVAILABLE = False
     GLBExporter = None
 
-try:
-    from .r15_glb_exporter import DEFAULT_R15_MESH_PATH, R15GLBExporter
-
-    R15_GLB_AVAILABLE = True
-except ImportError:
-    R15_GLB_AVAILABLE = False
-    R15GLBExporter = None
-    DEFAULT_R15_MESH_PATH = None
-
 __all__ = [
     # Unified visualization API (NEW - Phase 1, 2, 3 & 4)
     "Visualizer",
@@ -132,9 +123,6 @@ __all__ = [
     "get_visualizer",
     "GLBExporter",
     "get_glb_exporter",
-    "R15GLBExporter",
-    "get_r15_glb_exporter",
-    "DEFAULT_R15_MESH_PATH",
     "MotionVisualizer",
     "create_motion_visualization",
     "SeparateViewersGrid",
@@ -146,7 +134,6 @@ __all__ = [
     "create_keyframe_overlay",
     "GridConfig",
     "GLB_AVAILABLE",
-    "R15_GLB_AVAILABLE",
     "create_skeleton_comparison_html",
     "create_single_skeleton_html",
 ]
@@ -200,22 +187,3 @@ def get_glb_exporter(model_path, **kwargs):
     return GLBExporter(model_path, **kwargs)
 
 
-def get_r15_glb_exporter(**kwargs):
-    """Factory function to create R15 GLB exporter.
-
-    Args:
-        **kwargs: Additional arguments for R15GLBExporter:
-            - fps (int): Frames per second for animation (default 30)
-            - include_floor (bool): Whether to include checkerboard floor (default True)
-            - r15_mesh_path (str, optional): Path to R15 mesh GLB file
-
-    Returns:
-        R15GLBExporter instance
-    """
-    if not R15_GLB_AVAILABLE:
-        raise ImportError("R15 GLB export requires pygltflib. Install with: pip install pygltflib")
-
-    # Import here to avoid issues when not available
-    from .r15_glb_exporter import R15GLBExporter
-
-    return R15GLBExporter(**kwargs)

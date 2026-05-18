@@ -3,6 +3,7 @@
 | Topic | File |
 |-------|------|
 | Quick start (HumanML3D viz) | [QUICK_START.md](QUICK_START.md) |
+| Dataloaders (PyTorch datasets + collate) | [DATALOADERS.md](DATALOADERS.md) |
 | Unified visualizer | [UNIFIED_VISUALIZER_GUIDE.md](UNIFIED_VISUALIZER_GUIDE.md) |
 | Legacy / SMPL HTML viz | [VISUALIZATION_GUIDE.md](VISUALIZATION_GUIDE.md) |
 | Evaluation metrics | [EVALUATION_GUIDE.md](EVALUATION_GUIDE.md) |

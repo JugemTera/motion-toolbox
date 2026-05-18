@@ -16,6 +16,14 @@ from .converters import (
 from .core.motion import Motion
 from .core.skeleton import Skeleton
 
+# Datasets / dataloaders
+from .data import (
+    Format272Dataset,
+    HumanML3DDataset,
+    MotionFolderDataset,
+    motion_collate,
+)
+
 # IO — unified file loader
 from .io import load_motion
 
@@ -68,6 +76,11 @@ __all__ = [
     "list_converters",
     # IO
     "load_motion",
+    # Data
+    "MotionFolderDataset",
+    "Format272Dataset",
+    "HumanML3DDataset",
+    "motion_collate",
 ]
 
 

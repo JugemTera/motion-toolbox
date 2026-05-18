@@ -23,14 +23,14 @@ vis.visualize(motion_data, "output.html")
 The Unified Visualizer provides a single, consistent API for visualizing motion data regardless of:
 - **Input format**: HumanML3D 263D, 272D, 205D (STMC), Motion objects, joint positions
 - **Visualization mode**: Skeleton or mesh
-- **Body model**: SMPL, R15 (Roblox), MHR
+- **Body model**: SMPL, MHR
 
 ### Key Features
 
 - **Automatic format detection**: No need to specify format manually
 - **Intelligent compatibility checking**: Warns about incompatible combinations
 - **Fallback behavior**: Automatically uses skeleton when mesh isn't available
-- **Multi-body model support**: SMPL, R15, MHR in one API
+- **Multi-body model support**: SMPL, MHR in one API
 - **Frontend integration**: Export JSON for web apps
 
 ## Installation
@@ -88,9 +88,6 @@ vis.visualize(data, "auto.html", mode='auto')
 # SMPL mesh (24 joints, widely used)
 vis.visualize(motion, "smpl.html", mode='mesh', body_model='smpl')
 
-# R15 mesh (16 joints, Roblox avatars)
-vis.visualize(motion, "r15.html", mode='mesh', body_model='r15')
-
 # MHR mesh (53 joints, high-fidelity)
 # Note: MHR requires special setup
 vis.visualize(mhr_motion, "mhr.html", mode='mesh', body_model='mhr')
@@ -104,7 +101,7 @@ vis.visualize(mhr_motion, "mhr.html", mode='mesh', body_model='mhr')
 vis = Visualizer(
     body_model_path="/path/to/smpl/models",
     default_mode='skeleton',  # 'skeleton', 'mesh', 'auto'
-    default_body_model='smpl',  # 'smpl', 'r15', 'mhr'
+    default_body_model='smpl',  # 'smpl', 'mhr'
     on_incompatible='auto_skeleton',  # 'error' or 'auto_skeleton'
 )
 ```
@@ -152,14 +149,15 @@ Works with ALL formats:
 
 ### Mesh Visualization
 
-| Format | SMPL | R15 | MHR |
-|--------|------|-----|-----|
-| 263D (HumanML3D) | ⚠️ Requires SMPLify* | ⚠️ Requires SMPLify* | ❌ |
-| 272D | ✅ | ✅ | ✅ |
-| 205D (STMC) | ✅ | ✅ | ✅ |
-| Motion (SMPL) | ✅ | ✅ | ✅ |
-| Motion (MHR) | ⚠️ | ⚠️ | ✅ |
-| Joint positions | ❌ Needs rotations | ❌ Needs rotations | ❌ |
+| Format | SMPL | MHR |
+|--------|------|-----|
+| 263D (HumanML3D) | ⚠️ Requires SMPLify* | ❌ |
+| 272D | ✅ | ✅ |
+| 205D (STMC) | ✅ | ✅ |
+| 232D (ALIGN) | ✅ | ⚠️ |
+| Motion (SMPL) | ✅ | ⚠️ |
+| Motion (MHR) | ⚠️ | ✅ |
+| Joint positions | ❌ Needs rotations | ❌ |
 
 *SMPLify optimization is not run automatically (it's slow). Use skeleton visualization or convert to 272D first.
 

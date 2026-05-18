@@ -18,7 +18,6 @@ from .constants import (
     TIME_MODERATE,
     TIME_SIMPLE,
     TIME_SMPLIFY,
-    TIME_SMPLIFY_CHAIN,
 )
 from .format_detector import DetectedFormat
 
@@ -35,7 +34,6 @@ class BodyModel(Enum):
     """Available body models for mesh visualization."""
 
     SMPL = "smpl"
-    R15 = "r15"
     MHR = "mhr"
     AUTO = "auto"
 
@@ -122,20 +120,6 @@ class CompatibilityMatrix:
         "joint_positions",  # Generic joint positions require SMPLify
     }
 
-    # Define which formats work with R15
-    R15_DIRECT = set()  # None work directly
-
-    R15_SIMPLE_CONVERSION = {
-        "motion",  # Via SMPL → R15 converter
-        "272d",  # Via converter chain
-        "205d",  # Via converter chain
-        "smpl_params",  # Via SMPL → R15
-    }
-
-    R15_SMPLIFY_REQUIRED = {
-        "263d",  # HumanML3D → SMPL → R15
-    }
-
     # Define which formats work with MHR
     MHR_DIRECT = {
         "motion",  # If Motion has MHR skeleton
@@ -164,7 +148,7 @@ class CompatibilityMatrix:
         Args:
             format_type: Detected format type (e.g., '263d', 'motion')
             mode: Visualization mode ('skeleton', 'mesh', 'auto')
-            body_model: Body model for mesh visualization ('smpl', 'r15', 'mhr', 'auto')
+            body_model: Body model for mesh visualization ('smpl', 'mhr', 'auto')
             skeleton_type: Detected skeleton type (e.g., 'humanml3d', 'smpl')
 
         Returns:
@@ -187,8 +171,6 @@ class CompatibilityMatrix:
 
             if body_model == "smpl":
                 return self._check_smpl_compatibility(format_type, skeleton_type)
-            elif body_model == "r15":
-                return self._check_r15_compatibility(format_type, skeleton_type)
             elif body_model == "mhr":
                 return self._check_mhr_compatibility(format_type, skeleton_type)
             else:
@@ -197,7 +179,7 @@ class CompatibilityMatrix:
                     confidence=CONFIDENCE_CERTAIN,
                     conversion_required=ConversionRequirement.NOT_SUPPORTED,
                     warnings=[f"Unknown body model: {body_model}"],
-                    suggestions=["Use 'smpl', 'r15', or 'mhr' as body_model"],
+                    suggestions=["Use 'smpl' or 'mhr' as body_model"],
                 )
 
         return CompatibilityResult(
@@ -286,44 +268,6 @@ class CompatibilityMatrix:
             conversion_required=ConversionRequirement.NOT_SUPPORTED,
             warnings=[f"Format '{format_type}' cannot be converted to SMPL"],
             suggestions=["Use skeleton visualization instead"],
-        )
-
-    def _check_r15_compatibility(self, format_type: str, skeleton_type: str | None) -> CompatibilityResult:
-        """Check compatibility with R15 mesh visualization."""
-        # Simple conversion
-        if format_type in self.R15_SIMPLE_CONVERSION:
-            return CompatibilityResult(
-                compatible=True,
-                confidence=CONFIDENCE_GOOD,
-                conversion_required=ConversionRequirement.SIMPLE,
-                warnings=["Conversion to R15 may lose some joint detail"],
-                suggestions=[],
-                estimated_time=TIME_MODERATE,
-            )
-
-        # Requires SMPLify first
-        if format_type in self.R15_SMPLIFY_REQUIRED:
-            return CompatibilityResult(
-                compatible=True,
-                confidence=CONFIDENCE_MODERATE,
-                conversion_required=ConversionRequirement.SMPLIFY,
-                warnings=[
-                    "Requires conversion to SMPL first (via SMPLify), then SMPL → R15",
-                    "This can be slow (10-30 seconds) and may lose fidelity",
-                ],
-                suggestions=[
-                    "Consider using skeleton visualization",
-                    "Use on_incompatible='auto_skeleton' for faster results",
-                ],
-                estimated_time=TIME_SMPLIFY_CHAIN,
-            )
-
-        return CompatibilityResult(
-            compatible=False,
-            confidence=CONFIDENCE_CERTAIN,
-            conversion_required=ConversionRequirement.NOT_SUPPORTED,
-            warnings=[f"Format '{format_type}' cannot be converted to R15"],
-            suggestions=["Use skeleton visualization or convert to SMPL first"],
         )
 
     def _check_mhr_compatibility(self, format_type: str, skeleton_type: str | None) -> CompatibilityResult:

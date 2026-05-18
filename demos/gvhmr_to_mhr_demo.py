@@ -4,11 +4,12 @@ Loads GVHMR motion, converts to MHR using vertex fitting, and displays
 both SMPL (original) and MHR (converted) side-by-side.
 """
 
+import base64
+import json
 import sys
 from pathlib import Path
-import json
+
 import torch
-import base64
 
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / "src"))
@@ -27,9 +28,9 @@ def main():
         GVHMRToMotionConverter,
         MHRToMotionConverter,
     )
-    from motion_toolbox.visualization.glb_exporter import GLBExporter
-    from motion_toolbox.core.body_models.smpl import SMPLBodyModel
     from motion_toolbox.core.body_models.mhr import MHRBodyModel
+    from motion_toolbox.core.body_models.smpl import SMPLBodyModel
+    from motion_toolbox.visualization.glb_exporter import GLBExporter
     from motion_toolbox.visualization.template_renderer import (
         TemplateRenderer,
         render_ground_plane_code,
@@ -59,7 +60,7 @@ def main():
             pairs.append((gvhmr_file, mhr_file))
 
     if not pairs:
-        print(f"❌ No GVHMR/MHR pairs found")
+        print("❌ No GVHMR/MHR pairs found")
         return 1
 
     print(f"\n📂 Found {len(pairs)} GVHMR→MHR pair(s)")
@@ -88,7 +89,7 @@ def main():
 
     scene_data = []
 
-    print(f"\n🎬 Processing...")
+    print("\n🎬 Processing...")
     for i, (gvhmr_file, mhr_file) in enumerate(pairs):
         print(f"\n   [{i+1}/{len(pairs)}] {gvhmr_file.stem}")
 

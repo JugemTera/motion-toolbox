@@ -10,7 +10,10 @@ Each `.npy` file has shape `(frames, 272)` with layout described in
 
 ## Optional download helper
 
-See `scripts/download_272_samples.py` (prints guidance; set your own public mirror URL if needed).
+See `scripts/download_272_samples_template.py` for a Hugging Face
+``snapshot_download`` template — fill in ``HF_USER`` / ``DATASET_NAME``
+once the public mirror is finalised. ``scripts/fetch_sample_data_template.sh``
+does the same for the rest of ``sample_data/``.
 
 ## License
 

@@ -24,7 +24,7 @@ Creates a **single 3D scene** with multiple animated characters arranged in a sp
 
 **Run:**
 ```bash
-python motion_toolbox/demos/spatial_animation_grid_demo.py
+uv run python demos/spatial_animation_grid_demo.py
 ```
 
 ---
@@ -117,8 +117,8 @@ create_keyframe_overlay(
 ### Running a Demo
 
 ```bash
-# From the project root
-cd /path/to/autoanim-itw-motion-dataset
+# From the repository root
+cd /path/to/motion-toolbox
 
 # Run the spatial grid demo (multiple animations)
 uv run python demos/spatial_animation_grid_demo.py

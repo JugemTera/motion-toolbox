@@ -1,18 +1,17 @@
 """Simple Standalone Test: Unified Visualizer
 
-This version works immediately by running the unit tests and generating
-an HTML report. Use this until the PRs are merged.
+This script runs the unified visualizer unit tests and writes an HTML
+report summarising the results.
 
 USAGE:
-    cd /path/to/motion_toolbox
+    # From the repository root
     PYTHONPATH=src python3 examples/test_visualizer_simple.py
 """
 
 import subprocess
-import sys
-from pathlib import Path
-import json
 from datetime import datetime
+from pathlib import Path
+
 
 def run_tests_and_generate_report():
     """Run unit tests and generate HTML report."""
@@ -213,10 +212,9 @@ def run_tests_and_generate_report():
             <div class="capabilities">
                 <h2>✨ Features Tested</h2>
                 <ul>
-                    <li>Format detection (263D, 272D, 205D, Motion, joints)</li>
+                    <li>Format detection (263D, 272D, 205D, 232D ALIGN, Motion, joints)</li>
                     <li>Compatibility matrix validation</li>
                     <li>SMPL mesh visualization support</li>
-                    <li>R15 (Roblox) mesh visualization</li>
                     <li>MHR mesh visualization</li>
                     <li>Skeleton visualization (all formats)</li>
                     <li>AUTO mode intelligence</li>

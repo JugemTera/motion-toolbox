@@ -179,18 +179,6 @@ class TestCompatibilityMatrix:
         assert len(result.warnings) > 0
         assert "slow" in result.warnings[0].lower()
 
-    def test_r15_simple_conversion(self):
-        """Test R15 simple conversion."""
-        result = self.matrix.check_compatibility("motion", "mesh", "r15", "smpl")
-        assert result.compatible
-        assert result.conversion_required == ConversionRequirement.SIMPLE
-
-    def test_r15_smplify_required(self):
-        """Test R15 SMPLify requirement."""
-        result = self.matrix.check_compatibility("263d", "mesh", "r15")
-        assert result.compatible
-        assert result.conversion_required == ConversionRequirement.SMPLIFY
-
     def test_mhr_direct_compatibility(self):
         """Test MHR direct compatibility."""
         result = self.matrix.check_compatibility("motion", "mesh", "mhr", "mhr")
@@ -515,16 +503,6 @@ class TestMeshVisualizer:
         except Exception as e:
             # Expected to fail with model path error, not initialization error
             assert "model_path" in str(e).lower() or "does not exist" in str(e).lower()
-
-    def test_initialization_r15(self):
-        """Test MeshVisualizer initialization with R15."""
-        from motion_toolbox.visualization import MeshVisualizer
-
-        try:
-            vis = MeshVisualizer(body_model="r15")
-            assert vis.body_model == "r15"
-        except ImportError:
-            pytest.skip("pygltflib not installed")
 
     def test_initialization_mhr(self):
         """Test MeshVisualizer initialization with MHR."""

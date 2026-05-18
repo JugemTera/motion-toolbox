@@ -147,7 +147,7 @@ def build_gltf(
     num_joints = joints.shape[1]
     num_frames = joints.shape[0]
 
-    # HACK: Use initial joints as template
+    # Use the first frame's joints as the rest-pose template for skinning.
     J_template = init_joints[0]
     num_vertices = vertices.shape[1]
 

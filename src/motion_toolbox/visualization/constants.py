@@ -49,7 +49,6 @@ JOINT_COUNTS = {
     "smplx": 54,  # SMPL + hands + face (10,475 vertices, 54 joints)
     # Other skeleton types
     "h36m": 19,  # Human3.6M dataset
-    "r15": 16,  # Roblox R15
     "mhr": 53,  # Meta Human Rig (approximate, can vary)
 }
 
@@ -90,7 +89,6 @@ TIME_ESTIMATES = {
     "simple": 1.0,  # Simple format conversions
     "moderate": 2.0,  # More complex conversions (e.g., retargeting)
     "smplify": 20.0,  # SMPLify optimization (slow)
-    "smplify_chain": 25.0,  # SMPLify + additional conversion
 }
 
 # Legacy constants for backward compatibility (deprecated, use TIME_ESTIMATES instead)
@@ -99,7 +97,6 @@ TIME_FAST = TIME_ESTIMATES["fast"]
 TIME_SIMPLE = TIME_ESTIMATES["simple"]
 TIME_MODERATE = TIME_ESTIMATES["moderate"]
 TIME_SMPLIFY = TIME_ESTIMATES["smplify"]
-TIME_SMPLIFY_CHAIN = TIME_ESTIMATES["smplify_chain"]
 
 
 # =============================================================================
@@ -135,14 +132,6 @@ KINEMATIC_CHAINS = {
         [0, 3, 6, 9, 12, 15],  # Spine: pelvis -> spine1 -> spine2 -> spine3 -> neck -> head
         [9, 14, 17, 19, 21, 23],  # Right arm: spine3 -> r_collar -> r_shoulder -> r_elbow -> r_wrist -> r_hand
         [9, 13, 16, 18, 20, 22],  # Left arm: spine3 -> l_collar -> l_shoulder -> l_elbow -> l_wrist -> l_hand
-    ],
-    # R15 skeleton (16 joints - Roblox)
-    "r15": [
-        [0, 1, 2, 3],  # Spine/torso
-        [3, 4, 5, 6],  # Left arm
-        [3, 7, 8, 9],  # Right arm
-        [0, 10, 11, 12],  # Left leg
-        [0, 13, 14, 15],  # Right leg
     ],
     # SOMA30 skeleton (30 joints — Kimodo / NVIDIA SOMA compact)
     # Joint indices match Skeleton.from_soma30():

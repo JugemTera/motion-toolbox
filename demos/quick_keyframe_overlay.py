@@ -2,10 +2,10 @@
 """Quick script to create keyframe overlay visualization for any motion file.
 
 Usage:
-    uv run python motion_toolbox/demos/quick_keyframe_overlay.py path/to/motion.pt
+    uv run python demos/quick_keyframe_overlay.py path/to/motion.pt
 
 Or with custom settings:
-    uv run python motion_toolbox/demos/quick_keyframe_overlay.py path/to/motion.pt --num-keyframes 15 --opacity 0.3
+    uv run python demos/quick_keyframe_overlay.py path/to/motion.pt --num-keyframes 15 --opacity 0.3
 """
 
 import argparse
@@ -42,13 +42,13 @@ def main():
         epilog="""
 Examples:
   # Basic usage
-  uv run python motion_toolbox/demos/quick_keyframe_overlay.py my_motion.pt
+  uv run python demos/quick_keyframe_overlay.py my_motion.pt
   
   # With more keyframes and lower opacity
-  uv run python motion_toolbox/demos/quick_keyframe_overlay.py my_motion.pt --num-keyframes 20 --opacity 0.3
+  uv run python demos/quick_keyframe_overlay.py my_motion.pt --num-keyframes 20 --opacity 0.3
   
   # White characters with Phong material
-  uv run python motion_toolbox/demos/quick_keyframe_overlay.py my_motion.pt --color white --material phong
+  uv run python demos/quick_keyframe_overlay.py my_motion.pt --color white --material phong
         """
     )
     

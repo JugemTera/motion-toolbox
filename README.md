@@ -6,7 +6,7 @@ A Python library for 3D character animation and motion processing, supporting mu
 
 - **🎨 Unified Visualization System** (NEW): Single API for all motion formats and body models
   - Automatic format detection (263D, 272D, 205D, 232D ALIGN, Motion, joints)
-  - Multi-body model support (SMPL, R15, MHR)
+  - Multi-body model support (SMPL, MHR)
   - Skeleton and mesh visualization
   - Frontend integration with JSON export
 - **Multiple Rotation Formats**: Quaternions and axis-angles with seamless conversion
@@ -20,6 +20,45 @@ A Python library for 3D character animation and motion processing, supporting mu
 ## Project status
 
 Research code for the **ROMO** project: APIs may change between releases. Not intended for production use without your own hardening.
+
+## Dataset
+
+The companion in-the-wild motion dataset is hosted on Hugging Face Hub.
+The link below is a placeholder until the public mirror is finalised; the
+toolbox itself doesn't depend on the dataset to function — every loader
+also accepts a local folder of motion files.
+
+> 📦 **Hugging Face mirror (placeholder):** `https://huggingface.co/datasets/<HF_USER>/<DATASET_NAME>`
+>
+> Once the dataset is published, drop the URL into
+> `scripts/fetch_sample_data_template.sh` and
+> `scripts/download_272_samples_template.py` (they already contain the
+> wiring for `huggingface_hub.snapshot_download`).
+
+A typical end-to-end loop — load a folder of `.npy` motions, batch them,
+and visualise the batch as HTML — looks like this:
+
+```python
+from torch.utils.data import DataLoader
+
+from motion_toolbox.data import Format272Dataset, motion_collate
+from motion_toolbox.visualization import Visualizer
+
+dataset = Format272Dataset("path/to/your/272d/folder")
+loader = DataLoader(dataset, batch_size=8, shuffle=True, collate_fn=motion_collate)
+
+for batch in loader:
+    rotations = batch["joint_rotations"]    # (B, T_max, J, 3) torch.float32
+    translation = batch["root_translation"]  # (B, T_max, 3)
+    mask = batch["mask"]                     # (B, T_max) bool
+
+# Render one HTML viewer per sample for the first eight items
+Visualizer().visualize_batch(dataset, output_dir="outputs/preview", limit=8)
+```
+
+See [`docs/DATALOADERS.md`](docs/DATALOADERS.md) for the full dataloader
+API (generic folder dataset, 272-D dataset, HumanML3D dataset, custom
+transforms, and using the collated batches for training).
 
 ## Installation
 
@@ -117,7 +156,7 @@ vis = Visualizer()
 vis.visualize(motion_data, "output.html")  # That's it!
 
 # Supports: 263D (HumanML3D), 272D, 205D (STMC), 232D (ALIGN), Motion objects, joint positions
-# Modes: skeleton (fast), mesh (SMPL/R15/MHR)
+# Modes: skeleton (fast), mesh (SMPL / MHR)
 ```
 
 See [`docs/UNIFIED_VISUALIZER_GUIDE.md`](docs/UNIFIED_VISUALIZER_GUIDE.md) for complete guide.
@@ -411,8 +450,8 @@ See `demos/README.md` for detailed documentation and customization options.
 
 ```bash
 uv sync --group dev
-uv run ruff check src tests scripts demos examples
-uv run ruff format src tests scripts demos examples
+uv run ruff check src tests scripts
+uv run ruff format src tests scripts
 # Default CI excludes optional GPU / SMPL-on-disk tests:
 uv run pytest -m "not requires_smpl and not requires_mhr and not gpu" --tb=short
 ```

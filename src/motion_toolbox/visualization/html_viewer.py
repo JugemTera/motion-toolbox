@@ -69,7 +69,7 @@ class MotionVisualizer:
         return f"data:model/gltf-binary;base64,{base64_data}"
 
     def _generate_html_template(self, glb_base64: str, title: str, width: str, height: str) -> str:
-        """Generate Roblox-styled HTML template matching skeleton visualizer.
+        """Generate pill-styled HTML template matching skeleton visualizer.
 
         Args:
             glb_base64 (str): Base64 encoded GLB data URL

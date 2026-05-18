@@ -21,7 +21,6 @@ Default Settings (optimized for research papers):
 - 50% initial keyframe opacity
 """
 
-import os
 import sys
 from pathlib import Path
 

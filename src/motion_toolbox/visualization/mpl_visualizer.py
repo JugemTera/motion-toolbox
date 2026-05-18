@@ -2,8 +2,11 @@
 
 This module provides CPU-based 3D motion rendering using matplotlib.
 Serves as a fallback when PyTorch3D is not available or GPU acceleration is not needed.
+
+The interactive HTML visualizer (``motion_toolbox.visualization.Visualizer``) is
+the recommended path; this matplotlib backend is kept for headless rendering
+and offline debugging.
 """
-# TODO: consider removing this now that the html visualizer is working.
 
 from pathlib import Path
 

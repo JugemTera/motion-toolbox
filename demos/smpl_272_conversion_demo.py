@@ -26,6 +26,7 @@ def main():
     print("Supports: HumanML3D (ground truth) and SMPL input formats")
     
     import os
+
     from dotenv import load_dotenv
     
     # Load environment variables
@@ -63,7 +64,7 @@ def main():
         input_format = "smpl"
         print(f"\n📂 Loading SMPL data: {input_file.name}")
     else:
-        print(f"\n❌ No sample data found!")
+        print("\n❌ No sample data found!")
         print(f"   Tried: {sample_smpl_dir} (SMPL .npz)")
         print(f"   Tried: {sample_humanml3d_dir} (HumanML3D .npy)")
         return 1
@@ -76,9 +77,9 @@ def main():
         
         humanml3d_data = np.load(input_file)
         print(f"\n📊 HumanML3D Data: shape {humanml3d_data.shape}, dtype {humanml3d_data.dtype}")
-        print(f"   Format: 263-dimensional representation (T-1 frames)")
+        print("   Format: 263-dimensional representation (T-1 frames)")
         
-        from converters.humanml3d_to_smpl import HumanML3DToSMPLConverter
+        from motion_toolbox.converters.humanml3d_to_smpl import HumanML3DToSMPLConverter
         
         print("\n⚙️  Converting HumanML3D → SMPL using IK...")
         humanml3d_to_smpl = HumanML3DToSMPLConverter(
@@ -88,7 +89,7 @@ def main():
         
         smpl_data = humanml3d_to_smpl.convert(humanml3d_data)
         
-        print(f"\n✅ HumanML3D → SMPL conversion complete!")
+        print("\n✅ HumanML3D → SMPL conversion complete!")
         print(f"   Output: SMPL parameters for {smpl_data['body_pose'].shape[0]} frames")
         
     else:  # input_format == "smpl"
@@ -108,15 +109,15 @@ def main():
     print("STEP 1: Converting SMPL → 272D")
     print("=" * 80)
     
-    from converters.motion_converters import SMPLTo272Converter
-    
+    from motion_toolbox.converters.motion_converters import SMPLTo272Converter
+
     smpl_to_272 = SMPLTo272Converter(body_model_path=body_model_path)
     print(f"✅ Created converter: {smpl_to_272}")
     
     print("\n⚙️  Running conversion...")
     motion_272 = smpl_to_272.convert(smpl_data)
     
-    print(f"\n✅ Conversion complete!")
+    print("\n✅ Conversion complete!")
     print(f"   Output shape: {motion_272.shape}")
     print(f"   Frames: {motion_272.shape[0]}")
     print(f"   Features: {motion_272.shape[1]}")
@@ -157,16 +158,16 @@ def main():
     print("STEP 2: Converting 272D → SMPL (Round-trip test)")
     print("=" * 80)
     
-    from converters.motion_converters import Format272ToSMPLConverter
-    
+    from motion_toolbox.converters.motion_converters import Format272ToSMPLConverter
+
     format_272_to_smpl = Format272ToSMPLConverter(body_model_path=body_model_path)
     print(f"✅ Created converter: {format_272_to_smpl}")
     
     print("\n⚙️  Running conversion...")
     recovered_smpl = format_272_to_smpl.convert(motion_272)
     
-    print(f"\n✅ Conversion complete!")
-    print(f"\n📊 Recovered SMPL Parameters:")
+    print("\n✅ Conversion complete!")
+    print("\n📊 Recovered SMPL Parameters:")
     for key, value in recovered_smpl.items():
         if hasattr(value, 'shape'):
             print(f"   {key}: shape {value.shape}, dtype {value.dtype}")
@@ -213,7 +214,7 @@ def main():
     recovered_trans_diff = recovered_trans[1:] - recovered_trans[:-1] if len(recovered_trans) > 1 else recovered_trans
     trans_error = np.linalg.norm(orig_trans_diff - recovered_trans_diff, axis=-1).mean()
     
-    print(f"\n📏 Reconstruction Errors:")
+    print("\n📏 Reconstruction Errors:")
     print(f"   Body pose error:      {body_pose_error:.6f} radians")
     print(f"   Root orientation error: {root_orient_error:.6f} radians")
     print(f"   Translation error:    {trans_error:.6f} meters (relative motion)")
@@ -235,37 +236,24 @@ def main():
     print("=" * 80)
     
     try:
-        from converters.motion_converters import Format272ToMotionConverter
-        from visualization.glb_exporter import create_glb_from_motion
-        from visualization.html_viewer import create_motion_visualization
-        
+        from motion_toolbox.converters.motion_converters import Format272ToMotionConverter
+        from motion_toolbox.visualization import Visualizer
+
         print("\n⚙️  Converting 272D → Motion for visualization...")
         format_272_to_motion = Format272ToMotionConverter(body_model_path=body_model_path)
         motion = format_272_to_motion.convert(motion_272)
         print(f"✅ Motion: {motion.num_frames} frames, {motion.num_joints} joints")
-        
-        # Export GLB
-        print("\n⚙️  Exporting to GLB...")
-        glb_file = output_dir / f"{smpl_file.stem}_272d.glb"
-        create_glb_from_motion(
-            motion=motion,
-            output_path=str(glb_file),
-            body_model_path=body_model_path,
+
+        viewer_path = output_dir / f"{input_file.stem}_viewer.html"
+        Visualizer().visualize(
+            motion,
+            output_path=viewer_path,
+            mode="skeleton",
+            title=f"272D Motion: {input_file.stem}",
         )
-        print(f"✅ GLB exported: {glb_file}")
-        
-        # Create HTML viewer
-        print("\n⚙️  Creating HTML viewer...")
-        html_file = output_dir / f"{smpl_file.stem}_viewer.html"
-        create_motion_visualization(
-            glb_path=str(glb_file),
-            output_path=str(html_file),
-            title=f"272D Motion: {smpl_file.stem}",
-        )
-        print(f"✅ HTML viewer created: {html_file}")
-        
-        print(f"\n🌐 Open in browser: file://{html_file}")
-        
+        print(f"✅ HTML viewer created: {viewer_path}")
+        print(f"\n🌐 Open in browser: file://{viewer_path}")
+
     except ImportError as e:
         print(f"\n⚠️  Visualization skipped (missing dependencies): {e}")
     except Exception as e:
@@ -275,16 +263,16 @@ def main():
     print("\n" + "=" * 80)
     print("DEMO SUMMARY")
     print("=" * 80)
-    print(f"\n✅ Successfully demonstrated:")
-    print(f"   1. SMPL → 272D conversion")
-    print(f"   2. 272D → SMPL round-trip conversion")
-    print(f"   3. Error analysis (reconstruction quality)")
-    print(f"   4. Motion visualization pipeline")
+    print("\n✅ Successfully demonstrated:")
+    print("   1. SMPL → 272D conversion")
+    print("   2. 272D → SMPL round-trip conversion")
+    print("   3. Error analysis (reconstruction quality)")
+    print("   4. Motion visualization pipeline")
     print(f"\n📁 Output directory: {output_dir}")
-    print(f"\n💡 Next steps:")
-    print(f"   - Try with different SMPL files in sample_data/smpl/")
-    print(f"   - Use 272D data for motion generation models")
-    print(f"   - Visualize and compare original vs. recovered motions")
+    print("\n💡 Next steps:")
+    print("   - Try with different SMPL files in sample_data/smpl/")
+    print("   - Use 272D data for motion generation models")
+    print("   - Visualize and compare original vs. recovered motions")
     
     print("\n" + "=" * 80)
     return 0

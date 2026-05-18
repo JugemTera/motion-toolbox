@@ -363,8 +363,9 @@ class GroundPenetrationMetric(EvalMetric):
         # For now, fall back to height-based check with a warning
         ground_height = self.params["ground_height"]
 
-        # TODO: Implement actual mesh intersection
-        # This is a placeholder that uses height-based detection
+        # NOTE: true mesh-vs-floor intersection requires per-frame vertex
+        # buffers, which we don't have access to here. We fall back to the
+        # joint-height heuristic so the metric still produces a usable signal.
         penetration_depths = np.maximum(0.0, ground_height - positions[:, check_indices, 1])
 
         # Per-frame maximum penetration

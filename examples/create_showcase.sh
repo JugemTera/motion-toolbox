@@ -17,17 +17,14 @@ mkdir -p "$OUTPUT_DIR"
 echo "Generating visualizations using Python..."
 echo ""
 
-python3 << 'PYTHON_SCRIPT'
+PYTHONPATH="src" python3 << 'PYTHON_SCRIPT'
 import sys
-sys.path.insert(0, '.')
 
 import numpy as np
 from pathlib import Path
 
-# Import modules directly
-from visualization.unified_visualizer import Visualizer
-from core.motion import Motion
-from core.skeleton import Skeleton
+from motion_toolbox.visualization import Visualizer
+from motion_toolbox import Motion, Skeleton
 
 output_dir = Path('outputs/visualizer_showcase')
 output_dir.mkdir(parents=True, exist_ok=True)

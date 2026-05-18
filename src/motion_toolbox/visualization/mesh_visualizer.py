@@ -1,7 +1,7 @@
 """Mesh visualization backend for unified visualizer.
 
 This module provides mesh-based visualization for all supported body models
-(SMPL, R15, MHR), wrapping the existing exporters with a unified interface.
+(SMPL, MHR), wrapping the existing exporters with a unified interface.
 """
 
 import logging
@@ -23,11 +23,10 @@ class MeshVisualizer:
 
     Supports:
     - SMPL (via GLBExporter)
-    - R15 (via R15GLBExporter)
     - MHR (via MHRBodyModel) - requires MHR setup
 
     Attributes:
-        body_model: Body model type ('smpl', 'r15', 'mhr')
+        body_model: Body model type ('smpl', 'mhr')
         body_model_path: Path to body model files (for SMPL)
         fps: Frames per second
         include_floor: Whether to include checkerboard floor
@@ -48,7 +47,7 @@ class MeshVisualizer:
         """Initialize mesh visualizer.
 
         Args:
-            body_model: Body model type ('smpl', 'r15', 'mhr')
+            body_model: Body model type ('smpl', 'mhr')
             body_model_path: Path to body model files (required for SMPL)
             fps: Frames per second
             include_floor: Whether to include checkerboard floor
@@ -61,15 +60,13 @@ class MeshVisualizer:
         self.kwargs = kwargs
 
         # Validate body model
-        supported_models = {"smpl", "r15", "mhr"}
+        supported_models = {"smpl", "mhr"}
         if self.body_model not in supported_models:
             raise ValueError(f"Unsupported body model: {body_model}. Supported models: {supported_models}")
 
         # Initialize exporter based on body model
         if self.body_model == "smpl":
             self._init_smpl_exporter()
-        elif self.body_model == "r15":
-            self._init_r15_exporter()
         elif self.body_model == "mhr":
             self._init_mhr_exporter()
 
@@ -87,18 +84,6 @@ class MeshVisualizer:
 
         # We'll use vertex animation, store the model path for later
         self.exporter = None  # Will use custom export in visualize_motion
-
-    def _init_r15_exporter(self):
-        """Initialize R15 GLBExporter."""
-        from .r15_glb_exporter import R15GLBExporter
-
-        logger.info("Initializing R15 exporter")
-
-        self.exporter = R15GLBExporter(
-            fps=self.fps,
-            include_floor=self.include_floor,
-            **self.kwargs,
-        )
 
     def _init_mhr_exporter(self):
         """Initialize MHR body model.
@@ -217,11 +202,6 @@ class MeshVisualizer:
             # (actual conversion would happen in body model)
             return motion
 
-        elif self.body_model == "r15":
-            # R15 needs 16-joint motion
-            # SMPLToR15Converter handles this internally
-            return motion
-
         elif self.body_model == "mhr":
             # MHR needs model_data with model_parameters
             # Check if motion already has the required data
@@ -334,11 +314,10 @@ class MeshVisualizer:
         - White background
         - Checkerboard floor
         - Same camera/lighting
-        - Same Roblox-styled controls
+        - Same pill-styled playback controls
 
         Body model-specific transformations:
         - SMPL: Rotate 180° around X (Y-down → Y-up)
-        - R15: Already Y-up in GLB, just needs floor offset adjustment
         - MHR: TBD
         """
         import base64
@@ -537,41 +516,14 @@ class MeshVisualizer:
                 // No rotation needed - mesh vertices are already correct
                 // Just ensure facing camera if needed (optional Y rotation)
                 // model.rotation.y = Math.PI;  // Uncomment if you want to face camera
-            }} else if (bodyModel === 'r15') {{
-                // R15 needs to be flipped around X axis
-                model.rotation.x = Math.PI;
-                
-                // After X rotation, Y is inverted. The R15 exporter already applied
-                // a floor offset of ~1.168m, but it's now inverted.
-                // We need to shift down to compensate (the model is floating high up)
-                // Wait for model to be processed, then align
-                setTimeout(() => {{
-                    model.updateMatrixWorld(true);
-                    const box = new THREE.Box3().setFromObject(model);
-                    // Shift so min.y = 0 (feet on floor)
-                    model.position.y = -box.min.y;
-                }}, 100);
             }} else if (bodyModel === 'mhr') {{
                 // MHR is already in Y-up coordinate system
                 // Floor alignment is handled in the export (MHRBodyModel.export_glb)
                 // No additional transformations needed
             }}
             
-            // Apply materials and hide attachment point meshes
+            // Apply materials
             model.traverse((child) => {{
-                // Hide R15 attachment points and bone tips (debug geometry)
-                // Check node name and parent name for _Att, _end patterns
-                const nodeName = child.name || '';
-                const parentName = child.parent ? (child.parent.name || '') : '';
-                const isAttachment = nodeName.endsWith('_Att') || parentName.endsWith('_Att') ||
-                                    nodeName.endsWith('_end') || parentName.endsWith('_end') ||
-                                    nodeName.endsWith('_end_end') || parentName.endsWith('_end_end');
-                
-                if (isAttachment) {{
-                    child.visible = false;
-                    return;
-                }}
-                
                 if (child.isMesh) {{
                     // Compute vertex normals for smooth shading
                     if (child.geometry) {{
@@ -728,7 +680,7 @@ def visualize_mesh(
     Args:
         motion: Motion object
         output_path: Path to save output
-        body_model: Body model to use ('smpl', 'r15', 'mhr')
+        body_model: Body model to use ('smpl', 'mhr')
         **kwargs: Additional arguments for MeshVisualizer
 
     Returns:

@@ -1,16 +1,17 @@
 # Unified Visualizer Examples
 
-This directory contains comprehensive examples for testing and using the unified visualization system.
+This directory contains examples for testing and using the unified visualization system.
 
 ## Quick Start
 
-### Run the Comprehensive Test Suite
+### Run the Visualizer Test Suite
 
-This script tests ALL capabilities of the unified visualizer and generates a **beautiful HTML report**:
+Runs the unit tests in ``tests/test_unified_visualizer.py`` and writes a
+self-contained HTML summary report:
 
 ```bash
-cd /path/to/motion_toolbox   # repository root
-PYTHONPATH=src python3 examples/test_unified_visualizer_capabilities.py
+# From the repository root
+PYTHONPATH=src python3 examples/test_visualizer_simple.py
 ```
 
 **Output:** Opens a single `test_report.html` in your browser with:
@@ -24,7 +25,7 @@ PYTHONPATH=src python3 examples/test_unified_visualizer_capabilities.py
 - ✅ Automatic format detection (263D, 272D, 205D, joints, Motion)
 - ✅ Compatibility matrix validation
 - ✅ Skeleton visualization (all formats)
-- ✅ Mesh visualization (SMPL, R15)
+- ✅ Mesh visualization (SMPL, MHR)
 - ✅ AUTO mode intelligence
 - ✅ Fallback behavior
 - ✅ Scene data export for frontends
@@ -43,10 +44,10 @@ xdg-open outputs/unified_visualizer_test/test_report.html  # Linux
 
 ## Available Examples
 
-### 1. Comprehensive Capability Test
-**File:** `test_unified_visualizer_capabilities.py`
-**Purpose:** Complete test suite for all visualizer features
-**Recommended for:** Initial testing, validation, reference implementation
+### 1. Visualizer Test Suite
+**File:** `test_visualizer_simple.py`
+**Purpose:** Runs the visualizer unit tests and emits an HTML report
+**Recommended for:** Initial validation after install / changes
 
 **Tests covered:**
 ```
@@ -133,9 +134,6 @@ vis.visualize(data, "auto.html", mode='auto')
 ```python
 # SMPL (24 joints, academic datasets)
 vis.visualize(motion, "smpl.html", mode='mesh', body_model='smpl')
-
-# R15 (16 joints, Roblox avatars)
-vis.visualize(motion, "r15.html", mode='mesh', body_model='r15')
 
 # MHR (53+ joints, high-fidelity)
 vis.visualize(mhr_motion, "mhr.html", mode='mesh', body_model='mhr')

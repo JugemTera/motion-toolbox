@@ -5,7 +5,8 @@ SMPL Model Setup Script
 This script downloads and sets up SMPL body models for use with the motion toolbox.
 It removes chumpy dependencies and organizes models in the expected directory structure.
 
-TODO: check overlap with convert_smpl_models_standalone.py which does similar cleaning.
+Note: ``convert_smpl_models_standalone.py`` performs similar cleaning; the two
+scripts are kept separate intentionally (this one is download-oriented).
 
 Usage:
     python setup_smpl_models.py [--clean-only] [--output-dir PATH]

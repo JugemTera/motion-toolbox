@@ -14,6 +14,4 @@ This software bundles or integrates the following third-party materials. **Verif
 | **STMC** | ALIGN / STMC converters | See StableMotion / STMC upstream licenses referenced in docs |
 | **Plotly / Three.js** | HTML viewers | Plotly and Three.js per their respective licenses |
 | **Text-to-motion evaluators** | `scripts/download_t2m_evaluators.sh` | Follow original T2M / MDM / HumanML3D evaluator licenses |
-| **R15 mesh (optional)** | `assets/r15/` | **Redistribution may require permission** from the asset owner; confirm before open release |
-
 If you add new vendored code or data, extend this table.

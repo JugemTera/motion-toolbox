@@ -10,10 +10,10 @@ This follows the standard evaluation protocol used by MoMask, MDM, T2M-GPT,
 and other text-to-motion generation works.
 
 Input format:
-    Currently supports HumanML3D 263-d features (normalized).
-    # TODO: Future extension - accept Motion class objects and convert internally
-    # using the existing HumanML3D converters in converters/humanml3d_*.py.
-    # This would allow evaluating motions in any supported format.
+    Currently supports HumanML3D 263-d features (normalized). A future
+    extension can accept :class:`~motion_toolbox.core.motion.Motion`
+    instances and convert internally via the HumanML3D converters in
+    ``motion_toolbox.converters.humanml3d_*``.
 
 References:
     - Guo et al., "Generating Diverse and Natural 3D Human Motions from Text" (CVPR 2022)

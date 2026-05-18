@@ -16,7 +16,6 @@ Use Cases:
 - Individual inspection of multiple sequences
 """
 
-import os
 import sys
 from pathlib import Path
 
@@ -79,7 +78,7 @@ def main():
     print("=" * 70)
     print("Creating grid of separate viewers")
     print("=" * 70)
-    print(f"  Grid layout: 2 columns")
+    print("  Grid layout: 2 columns")
     print(f"  Total viewers: {len(pt_files)}\n")
     
     # Create labels for each animation

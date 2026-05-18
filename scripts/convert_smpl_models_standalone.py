@@ -20,7 +20,7 @@ smplh
 ├── SMPLH_FEMALE.pkl
 ├── SMPLH_MALE.pkl
 ├── SMPLH_NEUTRAL.pkl
-mano  # TODO validate that this srtucture works with the hand adddition script.
+mano  # MANO layout — used by the hand-add path; layout has not yet been re-verified.
 └── MANO_LEFT.pkl
 └── MANO_RIGHT.pkl
 

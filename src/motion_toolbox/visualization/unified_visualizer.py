@@ -36,8 +36,8 @@ class Visualizer:
     """Unified visualizer for motion data.
 
     This class provides a single interface for visualizing motion data in any format
-    (HumanML3D 263D, 272D, STMC 205D, Motion objects, etc.) with any visualization
-    mode (skeleton or mesh) and any body model (SMPL, R15, MHR).
+    (HumanML3D 263D, 272D, STMC 205D, ALIGN 232D, Motion objects, etc.) with any
+    visualization mode (skeleton or mesh) and any body model (SMPL, MHR).
 
     The visualizer automatically:
     - Detects the input format
@@ -87,7 +87,7 @@ class Visualizer:
             body_model_path: Path to body model files (for SMPL/SMPL-X)
                             Defaults to ~/.motion_toolbox/datasets/body_models_clean_pkl
             default_mode: Default visualization mode ('skeleton', 'mesh', 'auto')
-            default_body_model: Default body model for mesh ('smpl', 'r15', 'mhr', 'auto')
+            default_body_model: Default body model for mesh ('smpl', 'mhr', 'auto')
             on_incompatible: How to handle incompatible format/mode combinations:
                             - 'error': Raise IncompatibleFormatError
                             - 'auto_skeleton': Fall back to skeleton visualization (default)
@@ -106,7 +106,7 @@ class Visualizer:
             raise ValueError(f"default_mode must be one of {valid_modes}, got '{default_mode}'")
         self.default_mode = default_mode
 
-        valid_body_models = {"smpl", "r15", "mhr", "auto"}
+        valid_body_models = {"smpl", "mhr", "auto"}
         if default_body_model not in valid_body_models:
             raise ValueError(f"default_body_model must be one of {valid_body_models}, got '{default_body_model}'")
         self.default_body_model = default_body_model
@@ -147,7 +147,7 @@ class Visualizer:
             format: Optional format hint (overrides auto-detection)
             mode: Visualization mode ('skeleton', 'mesh', 'auto')
                  Defaults to self.default_mode
-            body_model: Body model for mesh visualization ('smpl', 'r15', 'mhr', 'auto')
+            body_model: Body model for mesh visualization ('smpl', 'mhr', 'auto')
                        Defaults to self.default_body_model
             on_incompatible: How to handle incompatible combinations
                             Overrides self.on_incompatible if provided
@@ -491,7 +491,7 @@ class Visualizer:
         """Get kinematic chains and colors for a skeleton type.
 
         Args:
-            skeleton_type: Type of skeleton (humanml3d, smpl, r15, mhr)
+            skeleton_type: Type of skeleton (humanml3d, smpl, mhr)
             num_joints: Number of joints in the skeleton
 
         Returns:
@@ -512,21 +512,6 @@ class Visualizer:
         elif skeleton_type == "smpl" or num_joints == 24:
             logger.info("Using SMPL kinematic chains (24 joints)")
             return SMPL_KINEMATIC_CHAINS, DEFAULT_CHAIN_COLORS
-
-        # R15 (16 joints - Roblox)
-        elif skeleton_type == "r15" or num_joints == 16:
-            logger.info("Using R15 kinematic chains (16 joints)")
-            # R15 has a simpler structure
-            # For now, use a basic chain structure
-            # TODO: Define proper R15 chains when R15 skeleton is implemented
-            kinematic_chains = [
-                [0, 1, 2, 3],  # Spine/torso
-                [3, 4, 5, 6],  # Left arm
-                [3, 7, 8, 9],  # Right arm
-                [0, 10, 11, 12],  # Left leg
-                [0, 13, 14, 15],  # Right leg
-            ]
-            return kinematic_chains, DEFAULT_CHAIN_COLORS
 
         # MHR (127 joints) - use simplified main chains (excludes procedural/twist joints)
         elif skeleton_type == "mhr" or num_joints >= 100:
@@ -1025,6 +1010,95 @@ class Visualizer:
             f"Cannot convert format '{format_type}' to Motion for mesh visualization. "
             f"Supported formats for mesh: motion, 272d, 205d, mhr"
         )
+
+    def visualize_batch(
+        self,
+        source: Any,
+        output_dir: str | Path,
+        *,
+        limit: int | None = None,
+        mode: str | None = "skeleton",
+        body_model: str | None = None,
+        fps: int = 20,
+        prefix: str = "",
+        **kwargs,
+    ) -> list[Path]:
+        """Visualize many motions from a dataset (or any iterable of samples).
+
+        Each item produced by ``source`` must be one of:
+
+        * a :class:`~motion_toolbox.core.motion.Motion` instance,
+        * a dict with a ``"motion"`` key (matches the dataset classes in
+          :mod:`motion_toolbox.data`), or
+        * a raw array / Motion-compatible payload that
+          :meth:`visualize` can route on its own.
+
+        Parameters
+        ----------
+        source:
+            Any sized or iterable producer of samples. Tested against
+            :class:`MotionFolderDataset`, :class:`Format272Dataset`,
+            :class:`HumanML3DDataset`, and a plain list of Motions.
+        output_dir:
+            Directory where the per-sample HTML files are written. Created
+            if missing.
+        limit:
+            Optional cap on the number of samples to render.
+        mode:
+            Visualization mode. Defaults to ``"skeleton"`` because it
+            works for every format without requiring SMPL weights on
+            disk. Pass ``"auto"`` to delegate to the unified routing
+            logic, or ``"mesh"`` to force a mesh viewer.
+        body_model, fps, **kwargs:
+            Forwarded to :meth:`visualize`.
+        prefix:
+            Prepended to each output filename.
+
+        Returns
+        -------
+        list[pathlib.Path]
+            Paths of the generated HTML files, in iteration order.
+        """
+        out_dir = Path(output_dir)
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        try:
+            iterator = (source[i] for i in range(len(source)))  # type: ignore[arg-type]
+            has_len = True
+        except TypeError:
+            iterator = iter(source)
+            has_len = False
+
+        outputs: list[Path] = []
+        for idx, sample in enumerate(iterator):
+            if limit is not None and idx >= limit:
+                break
+
+            if isinstance(sample, Motion):
+                data: Any = sample
+                name = f"motion_{idx:04d}"
+            elif isinstance(sample, dict) and "motion" in sample:
+                data = sample["motion"]
+                name = str(sample.get("name") or f"motion_{idx:04d}")
+            else:
+                data = sample
+                name = f"motion_{idx:04d}"
+
+            html_path = out_dir / f"{prefix}{name}.html"
+            self.visualize(
+                data,
+                html_path,
+                mode=mode,
+                body_model=body_model,
+                fps=fps,
+                title=name,
+                **kwargs,
+            )
+            outputs.append(html_path)
+            if not has_len:
+                logger.info(f"Rendered {idx + 1} samples to {out_dir}")
+
+        return outputs
 
     def to_scene_data(
         self,

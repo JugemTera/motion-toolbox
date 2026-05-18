@@ -8,14 +8,14 @@ This guide explains how to use the motion evaluation system to assess the qualit
 
 ```bash
 # Evaluate motion using a predefined configuration
-cd /path/to/autoanim-itw-motion-dataset
-uv run python motion_toolbox/scripts/gvhmr_motion_evaluation.py \
-    --data-file motion_toolbox/outputs/sample_data/gvhmr/gvhmr_1.pt \
-    --output-dir motion_toolbox/outputs/motion_evaluation \
+cd /path/to/motion-toolbox
+uv run python scripts/gvhmr_motion_evaluation.py \
+    --data-file sample_data/gvhmr/gvhmr_1.pt \
+    --output-dir outputs/motion_evaluation \
     --config configs/evaluation/final.yaml
 
 # Open the generated HTML report
-open motion_toolbox/outputs/motion_evaluation/gvhmr_1_evaluation_report.html
+open outputs/motion_evaluation/gvhmr_1_evaluation_report.html
 ```
 
 ### Programmatic Usage
@@ -214,9 +214,9 @@ Ground Penetration: 8% 🟢 Excellent
 ### Script Arguments
 
 ```bash
-# Run from project parent directory
-cd /path/to/autoanim-itw-motion-dataset
-uv run python motion_toolbox/scripts/gvhmr_motion_evaluation.py [OPTIONS]
+# Run from the repository root
+cd /path/to/motion-toolbox
+uv run python scripts/gvhmr_motion_evaluation.py [OPTIONS]
 
 Options:
   --data-file PATH          Path to motion .pt file
@@ -458,13 +458,13 @@ metrics:
 For evaluating multiple files:
 
 ```bash
-# Bash script for batch evaluation (run from project parent directory)
-cd /path/to/autoanim-itw-motion-dataset
-for file in motion_toolbox/outputs/sample_data/gvhmr/*.pt; do
+# Bash script for batch evaluation (run from the repository root)
+cd /path/to/motion-toolbox
+for file in sample_data/gvhmr/*.pt; do
     echo "Evaluating $(basename "$file")..."
-    uv run python motion_toolbox/scripts/gvhmr_motion_evaluation.py \
+    uv run python scripts/gvhmr_motion_evaluation.py \
         --data-file "$file" \
-        --output-dir "motion_toolbox/outputs/batch_evaluation/$(basename "$file" .pt)" \
+        --output-dir "outputs/batch_evaluation/$(basename "$file" .pt)" \
         --config configs/evaluation/final.yaml
 done
 ```
