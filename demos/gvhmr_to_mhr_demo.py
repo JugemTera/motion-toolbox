@@ -36,13 +36,21 @@ def main():
         render_ground_plane_code,
     )
 
-    # Check paths
     if not SMPL_MODEL_PATH.exists():
         print(f"❌ SMPL models not found at {SMPL_MODEL_PATH}")
         return 1
     if not MHR_ASSETS_DIR.exists():
         print(f"❌ MHR assets not found at {MHR_ASSETS_DIR}")
         print("   Run: bash scripts/setup_mhr.sh")
+        return 1
+
+    # MHR mesh export also requires the (non-public) `mhr` Python package.
+    import importlib.util
+
+    if importlib.util.find_spec("mhr") is None:
+        print("❌ `mhr` Python package not installed.")
+        print("   Install via the 'mhr' extra:  pip install -e '.[mhr]'")
+        print("   (Requires access to the proprietary MHR package; see docs/MHR_GUIDE.md.)")
         return 1
 
     print(f"✅ SMPL models: {SMPL_MODEL_PATH}")
@@ -91,7 +99,7 @@ def main():
 
     print("\n🎬 Processing...")
     for i, (gvhmr_file, mhr_file) in enumerate(pairs):
-        print(f"\n   [{i+1}/{len(pairs)}] {gvhmr_file.stem}")
+        print(f"\n   [{i + 1}/{len(pairs)}] {gvhmr_file.stem}")
 
         # Load and export SMPL (GVHMR)
         gvhmr_data = torch.load(gvhmr_file, weights_only=False)
@@ -110,22 +118,26 @@ def main():
         # Add to scene (SMPL left, MHR right for each pair)
         # Embed GLBs as base64 data URLs for local file viewing
         x_offset = i * 5
-        
+
         with open(smpl_glb, "rb") as f:
             smpl_b64 = base64.b64encode(f.read()).decode("utf-8")
         with open(mhr_glb, "rb") as f:
             mhr_b64 = base64.b64encode(f.read()).decode("utf-8")
-        
-        scene_data.append({
-            "glb": f"data:application/octet-stream;base64,{smpl_b64}",
-            "label": f"GVHMR #{i+1} (SMPL)",
-            "position": [x_offset - 1.25, 0, 0],
-        })
-        scene_data.append({
-            "glb": f"data:application/octet-stream;base64,{mhr_b64}",
-            "label": f"MHR #{i+1} (Fitted)",
-            "position": [x_offset + 1.25, 0, 0],
-        })
+
+        scene_data.append(
+            {
+                "glb": f"data:application/octet-stream;base64,{smpl_b64}",
+                "label": f"GVHMR #{i + 1} (SMPL)",
+                "position": [x_offset - 1.25, 0, 0],
+            }
+        )
+        scene_data.append(
+            {
+                "glb": f"data:application/octet-stream;base64,{mhr_b64}",
+                "label": f"MHR #{i + 1} (Fitted)",
+                "position": [x_offset + 1.25, 0, 0],
+            }
+        )
 
     # Create HTML viewer
     renderer = TemplateRenderer()

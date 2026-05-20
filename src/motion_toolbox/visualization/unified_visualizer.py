@@ -1149,10 +1149,14 @@ class Visualizer:
             # Extract joint positions
             positions = self._extract_joint_positions(data, detected_format)
 
+            # Pop forwarded kwargs so they don't collide with explicit args below.
+            fps_arg = kwargs.pop("fps", 20)
+            title_arg = kwargs.pop("title", f"Motion ({detected_format.format_type})")
+
             return exporter.export_skeleton(
                 positions,
-                fps=kwargs.get("fps", 20),
-                title=kwargs.get("title", f"Motion ({detected_format.format_type})"),
+                fps=fps_arg,
+                title=title_arg,
                 **kwargs,
             )
 

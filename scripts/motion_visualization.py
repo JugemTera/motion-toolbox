@@ -64,7 +64,7 @@ def detect_format(data_file: str) -> str:
     if ext == ".pt":
         # Likely GVHMR format
         try:
-            data = torch.load(data_file, map_location="cpu")
+            data = torch.load(data_file, map_location="cpu", weights_only=False)
             if isinstance(data, dict) and "smpl_params_global" in data:
                 return "gvhmr"
             else:

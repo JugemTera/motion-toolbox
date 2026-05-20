@@ -1245,7 +1245,7 @@ class GVHMRToMotionConverter(BaseMotionConverter):
             if not data_path.endswith(".pt"):
                 raise ValueError("GVHMR data file must be in .pt format")
             try:
-                gvhmr_data = torch.load(data_path, map_location="cpu")
+                gvhmr_data = torch.load(data_path, map_location="cpu", weights_only=False)
             except FileNotFoundError:
                 raise FileNotFoundError(f"GVHMR data file not found: {data_path}")
         elif isinstance(data, dict):

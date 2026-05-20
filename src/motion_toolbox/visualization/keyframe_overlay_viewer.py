@@ -137,8 +137,11 @@ class KeyframeOverlayViewer:
         """
         motion_path_obj = Path(motion_path)
 
-        # Load file and detect format
-        data = torch.load(motion_path)
+        # Load file and detect format. weights_only=False is required because
+        # GVHMR/Motion .pt files are pickled dicts with numpy arrays (not pure
+        # tensor state dicts); PyTorch 2.6+ defaults weights_only=True which
+        # rejects them.
+        data = torch.load(motion_path, weights_only=False)
 
         if not isinstance(data, dict):
             raise ValueError(f"Invalid motion file format: {motion_path}")

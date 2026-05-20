@@ -39,11 +39,11 @@ def find_body_models():
         Path.home() / ".model",
         _REPO / ".model",
     ]
-    
+
     for path in possible_paths:
         if path.exists():
             return str(path)
-    
+
     return None
 
 
@@ -54,20 +54,20 @@ def main():
     print("=" * 70)
     print("\nCreates a visualization with animated character and overlaid")
     print("keyframe poses positioned at their actual spatial locations.\n")
-    
+
     # Find sample data
     sample_dir = _REPO / "sample_data" / "gvhmr"
     pt_files = sorted(sample_dir.glob("*.pt"))
-    
+
     if not pt_files:
         print("❌ No sample PT files found in motion_toolbox/sample_data/gvhmr/")
         print("   Please add some .pt motion files to test with.")
         return 1
-    
+
     # Use the first sample file
     motion_file = pt_files[0]
     print(f"✅ Found sample motion file: {motion_file.name}")
-    
+
     # Find SMPL models
     body_model_path = find_body_models()
     if not body_model_path:
@@ -75,13 +75,13 @@ def main():
         print("   Download from: https://smpl.is.tue.mpg.de/download.php")
         print("   Install to: ~/.motion_toolbox/datasets/body_models_clean_pkl/")
         return 1
-    
+
     print(f"✅ Found SMPL models at: {body_model_path}\n")
-    
+
     # Setup output directory
     output_dir = _REPO / "outputs" / "keyframe_overlay_demo"
     output_dir.mkdir(parents=True, exist_ok=True)
-    
+
     print("=" * 70)
     print("Creating keyframe overlay with DEFAULT settings")
     print("=" * 70)
@@ -91,7 +91,7 @@ def main():
     print("  Keyframes: 10 (uniformly sampled)")
     print("  Opacity: 50% (adjustable in viewer)")
     print("  Modes: Overlap & Disappear (toggle in viewer)\n")
-    
+
     # Create visualization with defaults
     create_keyframe_overlay(
         motion_path=str(motion_file),
@@ -103,13 +103,13 @@ def main():
         sampling_strategy="uniform",
         # Note: Using all defaults - blue, physical, checkerboard
     )
-    
+
     print("\n" + "=" * 70)
     print("✅ DEMO COMPLETE")
     print("=" * 70)
     print(f"\n📁 Output directory: {output_dir}")
     print(f"🌐 HTML viewer: {output_dir}/keyframe_overlay.html\n")
-    
+
     print("🎬 Open the HTML file in a browser to view:")
     print("   • Main animation with overlaid keyframe poses")
     print("   • Keyframes positioned at their actual locations in sequence")
@@ -119,7 +119,7 @@ def main():
     print("   • Two display modes:")
     print("     - Overlap Mode: All keyframes visible (shows motion trail)")
     print("     - Disappear Mode: Keyframes disappear as animation passes\n")
-    
+
     print("💡 Customization examples:")
     print("   # More keyframes with white color")
     print("   create_keyframe_overlay(..., num_keyframes=20, mesh_color='white')")
@@ -130,10 +130,9 @@ def main():
     print("   # Different material with solid floor")
     print("   create_keyframe_overlay(..., material_type='phong', checkerboard_floor=False)")
     print("")
-    
+
     return 0
 
 
 if __name__ == "__main__":
     sys.exit(main())
-

@@ -53,7 +53,7 @@ def load_and_convert_gvhmr(
 
     try:
         # Load the data
-        data = torch.load(data_path, map_location="cpu")
+        data = torch.load(data_path, map_location="cpu", weights_only=False)
         logger.info(f"Data type: {type(data)}")
 
         if isinstance(data, dict) and "smpl_params_global" in data:

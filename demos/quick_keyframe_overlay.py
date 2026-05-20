@@ -27,11 +27,11 @@ def find_body_models():
         Path.home() / ".model",
         _REPO / ".model",
     ]
-    
+
     for path in possible_paths:
         if path.exists():
             return str(path)
-    
+
     return None
 
 
@@ -49,25 +49,33 @@ Examples:
   
   # White characters with Phong material
   uv run python demos/quick_keyframe_overlay.py my_motion.pt --color white --material phong
-        """
+        """,
     )
-    
+
     parser.add_argument("motion_file", type=str, help="Path to motion file (.pt)")
     parser.add_argument("--output", "-o", type=str, help="Output HTML path (default: outputs/keyframe_overlay.html)")
     parser.add_argument("--num-keyframes", "-k", type=int, default=10, help="Number of keyframes (default: 10)")
     parser.add_argument("--opacity", type=float, default=0.5, help="Keyframe opacity 0-1 (default: 0.5)")
-    parser.add_argument("--color", "-c", choices=["blue", "white", "clay", "grey"], default="blue", help="Mesh color (default: blue)")
-    parser.add_argument("--material", "-m", choices=["physical", "phong", "lambert"], default="physical", help="Material type (default: physical)")
+    parser.add_argument(
+        "--color", "-c", choices=["blue", "white", "clay", "grey"], default="blue", help="Mesh color (default: blue)"
+    )
+    parser.add_argument(
+        "--material",
+        "-m",
+        choices=["physical", "phong", "lambert"],
+        default="physical",
+        help="Material type (default: physical)",
+    )
     parser.add_argument("--body-models", type=str, help="Path to SMPL body models (auto-detected if not provided)")
-    
+
     args = parser.parse_args()
-    
+
     # Check motion file exists
     motion_path = Path(args.motion_file)
     if not motion_path.exists():
         print(f"❌ Motion file not found: {args.motion_file}")
         return 1
-    
+
     # Find body models
     body_model_path = args.body_models or find_body_models()
     if not body_model_path:
@@ -76,7 +84,7 @@ Examples:
         print("   Install to: ~/.motion_toolbox/datasets/body_models_clean_pkl/")
         print("   Or specify path with --body-models")
         return 1
-    
+
     # Determine output path
     if args.output:
         output_path = Path(args.output)
@@ -84,7 +92,7 @@ Examples:
         output_dir = _REPO / "outputs" / "keyframe_overlay"
         output_dir.mkdir(parents=True, exist_ok=True)
         output_path = output_dir / f"{motion_path.stem}_overlay.html"
-    
+
     # Create visualization
     print("=" * 70)
     print("KEYFRAME OVERLAY CREATOR")
@@ -95,7 +103,7 @@ Examples:
     print(f"🔢 Keyframes: {args.num_keyframes}")
     print(f"👁️  Opacity: {args.opacity}")
     print(f"💾 Output: {output_path}\n")
-    
+
     create_keyframe_overlay(
         motion_path=str(motion_path),
         output_html_path=str(output_path),
@@ -106,11 +114,10 @@ Examples:
         material_type=args.material,
         title=f"Keyframe Overlay: {motion_path.stem}",
     )
-    
+
     print(f"\n✅ Done! Open in browser: {output_path.absolute()}\n")
     return 0
 
 
 if __name__ == "__main__":
     sys.exit(main())
-

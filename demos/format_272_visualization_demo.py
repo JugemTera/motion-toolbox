@@ -64,8 +64,7 @@ def main() -> int:
     for f in files:
         motion = converter.convert(np.load(f))
         print(
-            f"  Converted {f.name}: {motion.num_frames} frames, {motion.num_joints} joints, "
-            f"{motion.framerate:.1f} fps"
+            f"  Converted {f.name}: {motion.num_frames} frames, {motion.num_joints} joints, {motion.framerate:.1f} fps"
         )
 
     print("\nDone.")

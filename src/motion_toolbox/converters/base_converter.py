@@ -88,8 +88,8 @@ class BaseMotionConverter(ABC):
             # Load data from file
             try:
                 data = torch.load(input_data, weights_only=False)
-            except Exception:
-                # Fallback for older PyTorch versions or other load issues
+            except TypeError:
+                # Fallback for PyTorch < 1.13 which lacks the weights_only kwarg.
                 data = torch.load(input_data)
 
             # Convert torch tensor to numpy if needed

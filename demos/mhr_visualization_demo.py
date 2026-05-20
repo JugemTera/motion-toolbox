@@ -20,10 +20,18 @@ def main():
 
     from motion_toolbox.visualization import create_spatial_animation_grid
 
-    # Check MHR assets
     if not MHR_ASSETS_DIR.exists():
         print(f"❌ MHR assets not found at {MHR_ASSETS_DIR}")
         print("   Run: bash scripts/setup_mhr.sh")
+        return 1
+
+    # MHR mesh export also requires the (non-public) `mhr` Python package.
+    import importlib.util
+
+    if importlib.util.find_spec("mhr") is None:
+        print("❌ `mhr` Python package not installed.")
+        print("   Install via the 'mhr' extra:  pip install -e '.[mhr]'")
+        print("   (Requires access to the proprietary MHR package; see docs/MHR_GUIDE.md.)")
         return 1
 
     # Find MHR data files
