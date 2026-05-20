@@ -571,8 +571,14 @@ class TestIntegratedMeshVisualization:
 class TestConversionPipelines:
     """Tests for format conversion pipelines (Phase 3)."""
 
+    @pytest.mark.requires_smpl
     def test_272d_to_motion_conversion(self):
-        """Test 272D to Motion conversion."""
+        """Test 272D to Motion conversion.
+
+        Requires SMPL body models because the conversion constructs a
+        :class:`Motion`, whose ``__post_init__`` runs forward kinematics via
+        ``smplx.create()``.
+        """
         from motion_toolbox.visualization import Visualizer
 
         vis = Visualizer()
@@ -587,8 +593,12 @@ class TestConversionPipelines:
         except ImportError:
             pytest.skip("Required converters not available")
 
+    @pytest.mark.requires_smpl
     def test_205d_to_motion_conversion(self):
-        """Test 205D (STMC) to Motion conversion."""
+        """Test 205D (STMC) to Motion conversion.
+
+        Requires SMPL body models (see ``test_272d_to_motion_conversion``).
+        """
         from motion_toolbox.visualization import Visualizer
 
         vis = Visualizer()
