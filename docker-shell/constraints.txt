@@ -1,0 +1,7 @@
+# Version constraints applied on top of pyproject.toml when building the Docker image.
+# PyPI's torch 2.6.0 Linux wheels bundle CUDA 12.4, matching the image's CUDA 12.4 base
+# and the host driver generation. Newer torch wheels move to CUDA 12.8/13.0 and would
+# require a newer driver. (The repo already targets "PyTorch 2.6 compat", see git log.)
+torch==2.6.0
+torchvision==0.21.0
+torchaudio==2.6.0

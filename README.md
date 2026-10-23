@@ -84,6 +84,18 @@ pip install -e ".[ml]"     # or uv pip install -e .
 
 The importable package name is `motion_toolbox` (Python module); the distribution name on PyPI-style metadata is `motion-toolbox`.
 
+### Docker
+
+A ready-to-use GPU image (CUDA 12.4, Python 3.11, PyTorch 2.6, core + `viz` + `semantic-eval` extras + the `dev` group) is defined in `docker-shell/`. Requires Docker with the NVIDIA Container Toolkit.
+
+```bash
+bash docker-shell/build.sh   # build image `motion-toolbox:latest` (once)
+bash docker-shell/run.sh     # start container `motion-toolbox` with GPU + repo mounted at /workspace
+bash docker-shell/exec.sh    # extra shell in the running container
+```
+
+The virtualenv lives at `/opt/venv` (already on `PATH`), with the package installed in editable mode from the mounted `/workspace/src`, so edits on the host are picked up directly. Inside the container run `python ...` / `pytest ...` directly rather than `uv run` (which would re-sync the environment). The `mhr` extra is not included; see `docs/MHR_SETUP_GUIDE.md`.
+
 ## MHR (Momentum Human Rig) Support
 
 MHR is a high-fidelity body model from Meta with 127 joints and realistic deformations.
